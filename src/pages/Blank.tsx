@@ -176,7 +176,7 @@ export default function Blank() {
       <PageBreadcrumb pageTitle="All Events" />
 
       <div className="rounded-2xl border border-gray-200 bg-white px-5 py-6 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-8">
-        <div className="w-full overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800">
+        <div className="w-full overflow-hidden rounded-xl dark:border-gray-800">
 
           {/* HEADER */}
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-200 px-5 py-4 dark:border-gray-800">
