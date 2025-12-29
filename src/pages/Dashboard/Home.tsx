@@ -1,11 +1,9 @@
-import EcommerceMetrics from "../../components/fleet-widgets/EcommerceMetrics";
-import StatisticsChart from "../../components/fleet-widgets/StatisticsChart";
-import MonthlyTarget from "../../components/fleet-widgets/MonthlyTarget";
 import RecentOrders from "../../components/fleet-widgets/XirgoDataTable";
 import DemographicCard from "../../components/fleet-widgets/DemographicCard";
 import PageMeta from "../../components/common/PageMeta";
 import { useEffect, useState } from "react";
 import { getLiveVehicles } from "../../services/xirgoApi";
+import StatCardGrid from "../../components/fleet-widgets/StatCardGrid";
 
 
 export default function Home() {
@@ -22,8 +20,7 @@ export default function Home() {
       />
       <div className="grid grid-cols-12 gap-4 md:gap-6">
         <div className="col-span-12 space-y-6 xl:col-span-7">
-          <EcommerceMetrics />
-          <EcommerceMetrics />
+          <StatCardGrid/>
         </div>
 
         <div className="col-span-12 xl:col-span-5">
