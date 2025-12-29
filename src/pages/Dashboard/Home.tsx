@@ -1,10 +1,16 @@
-import EcommerceMetrics from "../../components/ecommerce/EcommerceMetrics";
-import MonthlySalesChart from "../../components/ecommerce/MonthlySalesChart";
-import StatisticsChart from "../../components/ecommerce/StatisticsChart";
-import MonthlyTarget from "../../components/ecommerce/MonthlyTarget";
-import RecentOrders from "../../components/ecommerce/RecentOrders";
-import DemographicCard from "../../components/ecommerce/DemographicCard";
+import EcommerceMetrics from "../../components/fleet-widgets/EcommerceMetrics";
+import MonthlySalesChart from "../../components/fleet-widgets/MonthlySalesChart";
+import StatisticsChart from "../../components/fleet-widgets/StatisticsChart";
+import MonthlyTarget from "../../components/fleet-widgets/MonthlyTarget";
+import RecentOrders from "../../components/fleet-widgets/RecentOrders";
+import DemographicCard from "../../components/fleet-widgets/DemographicCard";
 import PageMeta from "../../components/common/PageMeta";
+import { useEffect } from "react";
+import { getLiveVehicles } from "../../services/xirgoApi";
+
+useEffect(() => {
+  getLiveVehicles().then(setVehicles);
+}, []);
 
 export default function Home() {
   return (
