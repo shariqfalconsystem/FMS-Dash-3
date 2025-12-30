@@ -1,9 +1,9 @@
-import RecentOrders from "../../components/fleet-widgets/XirgoDataTable";
 import DemographicCard from "../../components/fleet-widgets/DemographicCard";
 import PageMeta from "../../components/common/PageMeta";
 import { useEffect, useState } from "react";
 import { getLiveVehicles } from "../../services/xirgoApi";
 import StatCardGrid from "../../components/fleet-widgets/StatCardGrid";
+import XirgoDataTable from "../../components/fleet-widgets/XirgoDataTable";
 
 
 export default function Home() {
@@ -36,7 +36,7 @@ export default function Home() {
         </div> */}
 
         <div className="col-span-12 xl:col-span-12">
-          <RecentOrders />
+          <XirgoDataTable />
         </div>
       </div>
     </>

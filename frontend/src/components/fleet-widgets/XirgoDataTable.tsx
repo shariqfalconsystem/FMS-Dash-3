@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -6,42 +7,34 @@ import {
   TableRow,
 } from "../ui/table";
 import Badge from "../ui/badge/Badge";
-import {Truck} from 'lucide-react'
-/**
- * XIRGO VEHICLE DATA MODEL
- * (SmartAPI 2.1 aligned – frontend-friendly)
- */
-const tableData = [
-  {
-    id: 1,
-    vehicleName: "MH12 AB 1234",
-    deviceId: "XRG-10021",
-    speed: 62,
-    ignition: "ON",
-    location: "Pune, Maharashtra",
-    lastUpdate: "2 mins ago"
-  },
-  {
-    id: 2,
-    vehicleName: "DL01 CD 5678",
-    deviceId: "XRG-10045",
-    speed: 0,
-    ignition: "IDLE",
-    location: "New Delhi",
-    lastUpdate: "5 mins ago"
-  },
-  {
-    id: 3,
-    vehicleName: "KA05 EF 9090",
-    deviceId: "XRG-10078",
-    speed: 0,
-    ignition: "OFF",
-    location: "Bengaluru",
-    lastUpdate: "18 mins ago"
-  },
-];
+import { Truck } from "lucide-react";
 
-export default function RecentOrders() {
+type Vehicle = {
+  id: number;
+  vehicleName: string;
+  deviceId: string;
+  speed: number;
+  ignition: "ON" | "OFF" | "IDLE";
+  location: string;
+  lastUpdate: string;
+};
+
+export default function XirgoDataTable() {
+  const [tableData, setTableData] = useState<Vehicle[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/api/v1/xirgo/vehicles/live")
+      .then((res) => res.json())
+      .then((data: Vehicle[]) => setTableData(data))
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return <div className="p-6 text-gray-500">Loading vehicles...</div>;
+  }
+
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6">
       {/* HEADER */}
@@ -54,62 +47,26 @@ export default function RecentOrders() {
             Real-time data from Xirgo devices
           </p>
         </div>
-
-        <div className="flex items-center gap-3">
-          <button className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
-            Filter
-          </button>
-          <button className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-theme-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
-            See all
-          </button>
-        </div>
       </div>
 
       {/* TABLE */}
       <div className="max-w-full overflow-x-auto">
         <Table>
-          {/* TABLE HEADER */}
           <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
-            <TableRow className="align-middle">
-              <TableCell
-                isHeader
-                className="py-3 text-left text-theme-xs font-medium text-gray-500"
-              >
-                Vehicle Number & Device ID
-              </TableCell>
-
-              <TableCell
-                isHeader
-                className="py-3 text-left text-theme-xs font-medium text-gray-500"
-              >
-                Location
-              </TableCell>
-
-              <TableCell
-                isHeader
-                className="py-3 text-center text-theme-xs font-medium text-gray-500"
-              >
-                Speed
-              </TableCell>
-
-              <TableCell
-                isHeader
-                className="py-3 text-center text-theme-xs font-medium text-gray-500"
-              >
-                Ignition
-              </TableCell>
+            <TableRow>
+              <TableCell className="text-left text-sm" isHeader>Vehicle Number & Device ID</TableCell>
+              <TableCell className="text-left text-sm" isHeader>Location</TableCell>
+              <TableCell isHeader className="text-center text-sm">Speed</TableCell>
+              <TableCell isHeader className="text-center text-sm">Ignition</TableCell>
             </TableRow>
           </TableHeader>
 
-
-          {/* TABLE BODY */}
           <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
             {tableData.map((vehicle) => (
-              <TableRow key={vehicle.id} className="align-middle">
-
+              <TableRow key={vehicle.id}>
                 {/* VEHICLE */}
-                <TableCell className="py-3 text-left align-middle">
-                  <div className="flex items-center gap-3">
+                <TableCell>
+                  <div className="flex items-center gap-3 my-1">
                     <div className="h-12 w-12 flex items-center justify-center rounded-md bg-blue-50 text-blue-600">
                       <Truck size={28} strokeWidth={1.8} />
                     </div>
@@ -126,7 +83,7 @@ export default function RecentOrders() {
                 </TableCell>
 
                 {/* LOCATION */}
-                <TableCell className="py-3 text-left align-middle text-theme-sm text-gray-500">
+                <TableCell>
                   {vehicle.location}
                   <div className="text-theme-xs text-gray-400">
                     {vehicle.lastUpdate}
@@ -134,20 +91,20 @@ export default function RecentOrders() {
                 </TableCell>
 
                 {/* SPEED */}
-                <TableCell className="py-3 text-center align-middle text-theme-sm text-gray-500">
+                <TableCell className="text-center">
                   {vehicle.speed} km/h
                 </TableCell>
 
                 {/* IGNITION */}
-                <TableCell className="py-3 text-center align-middle">
+                <TableCell className="text-center">
                   <Badge
                     size="sm"
                     color={
                       vehicle.ignition === "ON"
                         ? "success"
                         : vehicle.ignition === "IDLE"
-                          ? "warning"
-                          : "error"
+                        ? "warning"
+                        : "error"
                     }
                   >
                     {vehicle.ignition}
@@ -156,7 +113,6 @@ export default function RecentOrders() {
               </TableRow>
             ))}
           </TableBody>
-
         </Table>
       </div>
     </div>
