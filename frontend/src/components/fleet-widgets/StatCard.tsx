@@ -1,17 +1,30 @@
+import { ComponentType, ReactNode } from "react";
 import Badge from "../ui/badge/Badge";
+
+type TrendDirection = "up" | "down";
+
+interface StatCardProps {
+  title: string;
+  value: string | number;
+  icon: ComponentType<{ className?: string }>;
+  trend?: ReactNode;
+  trendDirection?: TrendDirection;
+}
 
 export default function StatCard({
   title,
   value,
   icon: Icon,
   trend,
-  trendDirection = "up", // "up" | "down"
-}) {
+  trendDirection = "up",
+}: StatCardProps) {
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
       {/* Icon */}
       <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
-        <Icon className="size-6 text-gray-800 dark:text-white/90" />
+        {Icon && (
+          <Icon className="size-6 text-gray-800 dark:text-white/90" />
+        )}
       </div>
 
       {/* Content */}
