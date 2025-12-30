@@ -70,7 +70,7 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    name: "Device & Vehicle Health Data",
+    name: "Device Health Data",
     icon: <HeartPlus />,
     subItems: [
       { name: "Device Battery Status", path: "", pro: false },
