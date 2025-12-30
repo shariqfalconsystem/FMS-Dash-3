@@ -90,10 +90,10 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    name: "Network & Communication Data",
+    name: "Network Status",
     icon: <WifiPen />,
     subItems: [
-      { name: "Cellular", path: "", pro: false },
+      { name: "Cellular Data", path: "", pro: false },
       { name: "Firmware Version", path: "", pro: false },
       { name: "Device Configuration Data", path: "", pro: false }
     ],
