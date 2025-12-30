@@ -1,11 +1,22 @@
 import { useEffect, useState } from "react";
 import PageBreadcrumb from "../components/common/PageBreadCrumb";
-import PageMeta from "../components/common/PageMeta";
+/* ---------------------------------------------
+   1️⃣ TYPE DEFINITIONS (IMPORTANT)
+---------------------------------------------- */
+interface EventItem {
+  eventId: string;
+  eventType: string;
+  dateTime: string;
+  location: string;
+  tripId: string;
+  vehicleId: string;
+  vin: string;
+}
 
 /* ---------------------------------------------
-   1️⃣ FALLBACK DUMMY DATA (USED IF API FAILS)
+   2️⃣ FALLBACK DUMMY DATA
 ---------------------------------------------- */
-const dummyEvents = [
+const dummyEvents: EventItem[] = [
   {
     eventId: "EV155275",
     eventType: "Harsh Braking",
@@ -16,7 +27,7 @@ const dummyEvents = [
     vin: "ANUJTESTTESTESTE",
   },
   {
-    eventId: "EV150202",
+    eventId: "EV155276",
     eventType: "Harsh Cornering",
     dateTime: "12/23/2025 | 06:57 pm IST",
     location: "Taloja, Navi Mumbai, Maharashtra, India",
@@ -25,132 +36,48 @@ const dummyEvents = [
     vin: "ANUJTESTTESTESTE",
   },
   {
-    eventId: "EV150202",
-    eventType: "Harsh Cornering",
-    dateTime: "12/23/2025 | 06:57 pm IST",
-    location: "Taloja, Navi Mumbai, Maharashtra, India",
-    tripId: "TR33744",
-    vehicleId: "VHCI435",
+    eventId: "EV155277",
+    eventType: "Harsh Braking",
+    dateTime: "12/22/2025 | 11:40 am IST",
+    location: "Andheri West, Mumbai, Maharashtra, India",
+    tripId: "TR33745",
+    vehicleId: "VHCI436",
     vin: "ANUJTESTTESTESTE",
   },
   {
-    eventId: "EV150202",
+    eventId: "EV155278",
     eventType: "Harsh Cornering",
-    dateTime: "12/23/2025 | 06:57 pm IST",
-    location: "Taloja, Navi Mumbai, Maharashtra, India",
-    tripId: "TR33744",
-    vehicleId: "VHCI435",
-    vin: "ANUJTESTTESTESTE",
-  },
-  {
-    eventId: "EV150202",
-    eventType: "Harsh Cornering",
-    dateTime: "12/23/2025 | 06:57 pm IST",
-    location: "Taloja, Navi Mumbai, Maharashtra, India",
-    tripId: "TR33744",
-    vehicleId: "VHCI435",
-    vin: "ANUJTESTTESTESTE",
-  },
-  {
-    eventId: "EV150202",
-    eventType: "Harsh Cornering",
-    dateTime: "12/23/2025 | 06:57 pm IST",
-    location: "Taloja, Navi Mumbai, Maharashtra, India",
-    tripId: "TR33744",
-    vehicleId: "VHCI435",
-    vin: "ANUJTESTTESTESTE",
-  },
-  {
-    eventId: "EV150202",
-    eventType: "Harsh Cornering",
-    dateTime: "12/23/2025 | 06:57 pm IST",
-    location: "Taloja, Navi Mumbai, Maharashtra, India",
-    tripId: "TR33744",
-    vehicleId: "VHCI435",
-    vin: "ANUJTESTTESTESTE",
-  },
-  {
-    eventId: "EV150202",
-    eventType: "Harsh Cornering",
-    dateTime: "12/23/2025 | 06:57 pm IST",
-    location: "Taloja, Navi Mumbai, Maharashtra, India",
-    tripId: "TR33744",
-    vehicleId: "VHCI435",
-    vin: "ANUJTESTTESTESTE",
-  },
-  {
-    eventId: "EV150202",
-    eventType: "Harsh Cornering",
-    dateTime: "12/23/2025 | 06:57 pm IST",
-    location: "Taloja, Navi Mumbai, Maharashtra, India",
-    tripId: "TR33744",
-    vehicleId: "VHCI435",
-    vin: "ANUJTESTTESTESTE",
-  },
-  {
-    eventId: "EV150202",
-    eventType: "Harsh Cornering",
-    dateTime: "12/23/2025 | 06:57 pm IST",
-    location: "Taloja, Navi Mumbai, Maharashtra, India",
-    tripId: "TR33744",
-    vehicleId: "VHCI435",
-    vin: "ANUJTESTTESTESTE",
-  },
-  {
-    eventId: "EV150202",
-    eventType: "Harsh Cornering",
-    dateTime: "12/23/2025 | 06:57 pm IST",
-    location: "Taloja, Navi Mumbai, Maharashtra, India",
-    tripId: "TR33744",
-    vehicleId: "VHCI435",
-    vin: "ANUJTESTTESTESTE",
-  },
-  {
-    eventId: "EV150202",
-    eventType: "Harsh Cornering",
-    dateTime: "12/23/2025 | 06:57 pm IST",
-    location: "Taloja, Navi Mumbai, Maharashtra, India",
-    tripId: "TR33744",
-    vehicleId: "VHCI435",
-    vin: "ANUJTESTTESTESTE",
-  },
-  {
-    eventId: "EV150202",
-    eventType: "Harsh Cornering",
-    dateTime: "12/23/2025 | 06:57 pm IST",
-    location: "Taloja, Navi Mumbai, Maharashtra, India",
-    tripId: "TR33744",
-    vehicleId: "VHCI435",
+    dateTime: "12/21/2025 | 04:15 pm IST",
+    location: "Vashi, Navi Mumbai, Maharashtra, India",
+    tripId: "TR33746",
+    vehicleId: "VHCI437",
     vin: "ANUJTESTTESTESTE",
   },
 ];
 
-export default function Blank() {
-  /* ---------------------------------------------
-     2️⃣ STATE MANAGEMENT
-  ---------------------------------------------- */
-  const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+/* ---------------------------------------------
+   3️⃣ COMPONENT
+---------------------------------------------- */
+export default function Events() {
+  const [events, setEvents] = useState<EventItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
 
   /* ---------------------------------------------
-     3️⃣ API FETCH FUNCTION (PRODUCTION READY)
+     4️⃣ API FETCH (READY FOR REAL API)
   ---------------------------------------------- */
   const fetchEvents = async () => {
     try {
       setLoading(true);
       setError("");
 
-      // 🔁 Replace this URL with real API later
-      const API_URL = "/api/events";
-
-      // COMMENTED FOR NOW (NO API YET)
-      // const response = await fetch(API_URL);
+      // 🔁 Replace with real API later
+      // const response = await fetch("/api/events");
       // if (!response.ok) throw new Error("Failed to fetch events");
-      // const data = await response.json();
+      // const data: EventItem[] = await response.json();
       // setEvents(data);
 
-      // ✅ TEMP: using dummy data
+      // TEMP: Dummy data
       setTimeout(() => {
         setEvents(dummyEvents);
         setLoading(false);
@@ -158,13 +85,13 @@ export default function Blank() {
     } catch (err) {
       console.error(err);
       setError("Unable to load events");
-      setEvents(dummyEvents); // fallback safety
+      setEvents(dummyEvents);
       setLoading(false);
     }
   };
 
   /* ---------------------------------------------
-     4️⃣ FETCH ON PAGE LOAD
+     5️⃣ LOAD DATA ON MOUNT
   ---------------------------------------------- */
   useEffect(() => {
     fetchEvents();
@@ -172,11 +99,11 @@ export default function Blank() {
 
   return (
     <div>
-      <PageMeta title="Events Dashboard | TailAdmin" />
+      {/* <PageMeta title="Events Dashboard | TailAdmin" /> */}
       <PageBreadcrumb pageTitle="All Events" />
 
       <div className="rounded-2xl border border-gray-200 bg-white px-5 py-6 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-8">
-        <div className="w-full overflow-hidden rounded-xl dark:border-gray-800">
+        <div className="w-full overflow-hidden rounded-xl">
 
           {/* HEADER */}
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-200 px-5 py-4 dark:border-gray-800">

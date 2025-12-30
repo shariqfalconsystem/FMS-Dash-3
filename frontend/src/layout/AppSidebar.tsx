@@ -3,20 +3,13 @@ import { Link, useLocation } from "react-router";
 
 // Assume these icons are imported from an icon library
 import {
-  BoxCubeIcon,
-  CalenderIcon,
   ChevronDownIcon,
   GridIcon,
   HorizontaLDots,
-  ListIcon,
-  PageIcon,
-  PieChartIcon,
-  PlugInIcon,
-  TableIcon,
-  UserCircleIcon,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 import SidebarWidget from "./SidebarWidget";
+import { AlertTriangleIcon, CalendarMinus2, CarFront, Fuel, HeartPlus, MapPin, UserRound, WifiPen } from "lucide-react";
 
 type NavItem = {
   name: string;
@@ -29,35 +22,80 @@ const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
-    // subItems: [{ name: "Ecommerce", path: "/", pro: false }],
     path : "/"
   },
-  // {
-  //   icon: <CalenderIcon />,
-  //   name: "Calendar",
-  //   path: "/calendar",
-  // },
-  // {
-  //   icon: <UserCircleIcon />,
-  //   name: "User Profile",
-  //   path: "/profile",
-  // },
-  // {
-  //   name: "Forms",
-  //   icon: <ListIcon />,
-  //   subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }],
-  // },
-  // {
-  //   name: "Tables",
-  //   icon: <TableIcon />,
-  //   subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
-  // },
   {
     name: "Events",
-    icon: <PageIcon />,
+    icon: <CalendarMinus2 />,
     subItems: [
-      { name: "All Events", path: "/blank", pro: false },
-      // { name: "404 Error", path: "/error-404", pro: false },
+      { name: "All Events", path: "/blank", pro: false }
+    ],
+  },
+  {
+    name: "Vehicle & Engine Data",
+    icon: <CarFront />,
+    subItems: [
+      { name: "Vehicle Speed", path: "", pro: false },
+      { name: "Ignition Speed", path: "", pro: false },
+      { name: "Engine On/Off Status", path: "", pro: false }
+    ],
+  },
+  {
+    name: "Location",
+    icon: <MapPin />,
+    subItems: [
+      { name: "Real Time Vehicle Location", path: "", pro: false },
+      { name: "Trip Start & End Points", path: "", pro: false },
+      { name: "Route History", path: "", pro: false },
+      { name: "Lattitude & Longitude", path: "", pro: false }
+    ],
+  },
+  {
+    name: "Driver Behavior Data",
+    icon: <UserRound />,
+    subItems: [
+      { name: "Overspeed Events", path: "", pro: false },
+      { name: "Harsh Acceleration", path: "", pro: false },
+      { name: "Harsh Braking", path: "", pro: false },
+      { name: "Idle Time", path: "", pro: false }
+    ],
+  },
+  {
+    name: "Fuel & Efficiency Data",
+    icon: <Fuel />,
+    subItems: [
+      { name: "Fuel Usage Per Trip", path: "", pro: false },
+      { name: "Fuel Drain Events", path: "", pro: false },
+      { name: "Fuel Refill Events", path: "", pro: false }
+    ],
+  },
+  {
+    name: "Device & Vehicle Health Data",
+    icon: <HeartPlus />,
+    subItems: [
+      { name: "Device Battery Status", path: "", pro: false },
+      { name: "GPS Signal Strength", path: "", pro: false },
+      { name: "Device Reboot / Fault Logs", path: "", pro: false },
+      { name: "Cellular Signal Strength", path: "", pro: false }
+    ],
+  },
+  {
+    name: "Alerts & Events",
+    icon: <AlertTriangleIcon />,
+    subItems: [
+      { name: "Ignition On/Off Alerts", path: "", pro: false },
+      { name: "Overspeed Alerts", path: "", pro: false },
+      { name: "Engine Fault Alerts", path: "", pro: false },
+      { name: "Low Battery Alerts", path: "", pro: false }
+    ],
+  },
+  {
+    name: "Network & Communication Data",
+    icon: <WifiPen />,
+    subItems: [
+      { name: "Cellular", path: "", pro: false },
+      { name: "Firmware Version", path: "", pro: false },
+      { name: "Device Configuration Data", path: "", pro: false }
     ],
   },
 ];
@@ -359,17 +397,17 @@ const AppSidebar: React.FC = () => {
                     : "justify-start"
                 }`}
               >
-                {isExpanded || isHovered || isMobileOpen ? (
+                {/* {isExpanded || isHovered || isMobileOpen ? (
                   "Others"
                 ) : (
                   <HorizontaLDots />
-                )}
+                )} */}
               </h2>
-              {renderMenuItems(othersItems, "others")}
+              {/* {renderMenuItems(othersItems, "others")} */}
             </div>
           </div>
         </nav>
-        {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}
+        {/* {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null} */}
       </div>
     </aside>
   );
