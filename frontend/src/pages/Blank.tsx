@@ -99,7 +99,7 @@ export default function Events() {
 
   return (
     <div>
-      {/* <PageMeta title="Events Dashboard | TailAdmin" /> */}
+      {/* <PageMeta title="Events Dashboard | FMS" /> */}
       <PageBreadcrumb pageTitle="All Events" />
 
       <div className="rounded-2xl border border-gray-200 bg-white px-5 py-6 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-8">

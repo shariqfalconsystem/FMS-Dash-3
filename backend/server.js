@@ -1,101 +1,109 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
-
-
-dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = 5000;
 
-app.use(cors({
-  origin: "http://localhost:5173",
-  credentials: true,
+app.use(cors());
+app.use(express.json());
+
+/* ---------------- MOCK DATA ---------------- */
+
+const devices = Array.from({ length: 30 }).map((_, i) => ({
+  id: i + 1,
+  name: `Truck-${i + 1}`,
+  Online: Math.random() > 0.2,
+  Speed: Math.random() > 0.5 ? Math.floor(Math.random() * 80) : 0,
+  IgnitionOn: Math.random() > 0.3,
+  Latitude: 28.6 + Math.random() * 0.5,
+  Longitude: 77.1 + Math.random() * 0.5,
+  LastUpdate: new Date().toISOString(),
 }));
 
-// Health check
-app.get("/api/v1/health", (req, res) => {
-  res.json({ status: "OK" });
-});
+/* ---------------- APIs ---------------- */
 
-// Dummy Xirgo endpoint
-app.get("/api/v1/xirgo/vehicles", (req, res) => {
-  res.json([
-    {
-      key: "totalVehicles",
-      title: "Total Vehicles",
-      value: 128,
-      trend: "+6.2%",
-      trendDirection: "up",
-    },
-    {
-      key: "activeVehicles",
-      title: "Active Vehicles",
-      value: 96,
-      trend: "+3.1%",
-      trendDirection: "up",
-    },
-    {
-      key: "ignitionOn",
-      title: "Ignition ON",
-      value: 74,
-      trend: "-1.4%",
-      trendDirection: "down",
-    },
-    {
-      key: "geofenceAlerts",
-      title: "Geofence Alerts",
-      value: 12,
-      trend: "+2.8%",
-      trendDirection: "up",
-    },
-    // {
-    //   deviceId: "XRG-10021",
-    //   vehicle: "MH12 AB 1234",
-    //   speed: 62,
-    //   ignition: "ON",
-    //   lat: 18.5204,
-    //   lng: 73.8567,
-    //   lastUpdate: "2 mins ago",
-    // },
-  ]);
-});
-
-// tableData
-app.get("/api/v1/xirgo/vehicles/live", (req, res) => {
-  res.json([
-    {
+const vehicles = [
+  {
     id: 1,
-    vehicleName: "MH12 AB 1234",
-    deviceId: "XRG-10021",
+    vehicleName: "Truck-101",
+    deviceId: "DXAD12847108",
     speed: 62,
     ignition: "ON",
-    location: "Pune, Maharashtra",
-    lastUpdate: "2 mins ago"
+    location: "Delhi, India",
+    lastUpdate: new Date().toISOString(),
   },
   {
     id: 2,
-    vehicleName: "DL01 CD 5678",
-    deviceId: "XRG-10045",
+    vehicleName: "Truck-102",
+    deviceId: "T1SS1111AAAAC",
     speed: 0,
     ignition: "IDLE",
-    location: "New Delhi",
-    lastUpdate: "5 mins ago"
+    location: "Mumbai, India",
+    lastUpdate: new Date().toISOString(),
   },
   {
     id: 3,
-    vehicleName: "KA05 EF 9090",
-    deviceId: "XRG-10078",
+    vehicleName: "Truck-103",
+    deviceId: "DXAD12472943",
     speed: 0,
     ignition: "OFF",
-    location: "Bengaluru",
-    lastUpdate: "18 mins ago"
+    location: "Bengaluru, India",
+    lastUpdate: new Date().toISOString(),
   },
-  ]);
+];
+
+/* ---------------- ROUTES ---------------- */
+
+app.get("/api/v1/vehicles/live", (req, res) => {
+  res.json(vehicles);
 });
 
+/**
+ * DEVICES (Used by cards, table, map)
+ */
+app.get("/api/v1/devices", (req, res) => {
+  res.json(devices);
+});
 
-// Start server
+/**
+ * FUEL STATS
+ */
+app.get("/api/v1/fuel/stats", (req, res) => {
+  res.json({
+    todayAvg: 14.5,
+    yesterdayAvg: 13.8,
+  });
+});
+
+/**
+ * ALERT STATS
+ */
+app.get("/api/v1/alerts/stats", (req, res) => {
+  res.json({
+    today: 6,
+    yesterday: 9,
+  });
+});
+
+/**
+ * DRIVER STATS
+ */
+app.get("/api/v1/drivers/stats", (req, res) => {
+  res.json({
+    today: 18,
+    yesterday: 16,
+  });
+});
+
+/**
+ * HEALTH CHECK
+ */
+app.get("/", (req, res) => {
+  res.send("✅ Fleet Backend Running");
+});
+
+/* ---------------- START SERVER ---------------- */
+
 app.listen(PORT, () => {
-  console.log(`🚀 Backend running on http://localhost:${PORT}`);
+  console.log(`🚀 Backend running at http://localhost:${PORT}`);
 });

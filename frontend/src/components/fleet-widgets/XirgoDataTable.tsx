@@ -24,11 +24,35 @@ export default function XirgoDataTable() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/v1/xirgo/vehicles/live")
-      .then((res) => res.json())
-      .then((data: Vehicle[]) => setTableData(data))
-      .catch(console.error)
-      .finally(() => setLoading(false));
+    const fetchVehicles = async () => {
+      try {
+        const res = await fetch(
+          "http://localhost:5000/api/v1/vehicles/live"
+        );
+
+        if (!res.ok) {
+          throw new Error(`API error ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        // support both array and { data: [] }
+        const vehicles = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.data)
+            ? data.data
+            : [];
+
+        setTableData(vehicles);
+      } catch (err) {
+        console.error("❌ Failed to fetch vehicles", err);
+        setTableData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVehicles();
   }, []);
 
   if (loading) {
@@ -38,64 +62,61 @@ export default function XirgoDataTable() {
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6">
       {/* HEADER */}
-      <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-            Live Vehicles
-          </h3>
-          <p className="text-theme-xs text-gray-500">
-            Real-time data from Xirgo devices
-          </p>
-        </div>
+      <div className="mb-4">
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
+          Live Vehicles
+        </h3>
+        <p className="text-theme-xs text-gray-500">
+          Real-time data from Xirgo devices
+        </p>
       </div>
 
       {/* TABLE */}
       <div className="max-w-full overflow-x-auto">
         <Table>
-          <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
+          <TableHeader className="border-y">
             <TableRow>
-              <TableCell className="text-left text-sm" isHeader>Vehicle Number & Device ID</TableCell>
-              <TableCell className="text-left text-sm" isHeader>Location</TableCell>
-              <TableCell isHeader className="text-center text-sm">Speed</TableCell>
-              <TableCell isHeader className="text-center text-sm">Ignition</TableCell>
+              <TableCell isHeader>Vehicle & Device</TableCell>
+              <TableCell isHeader>Location</TableCell>
+              <TableCell isHeader className="text-center">
+                Speed
+              </TableCell>
+              <TableCell isHeader className="text-center">
+                Ignition
+              </TableCell>
             </TableRow>
           </TableHeader>
 
-          <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
+          <TableBody>
             {tableData.map((vehicle) => (
               <TableRow key={vehicle.id}>
-                {/* VEHICLE */}
                 <TableCell>
-                  <div className="flex items-center gap-3 my-1">
+                  <div className="flex items-center gap-3">
                     <div className="h-12 w-12 flex items-center justify-center rounded-md bg-blue-50 text-blue-600">
-                      <Truck size={28} strokeWidth={1.8} />
+                      <Truck size={26} />
                     </div>
-
                     <div>
-                      <p className="font-medium text-gray-800 dark:text-white/90">
+                      <p className="font-medium">
                         {vehicle.vehicleName}
                       </p>
-                      <span className="text-theme-xs text-gray-500">
+                      <span className="text-xs text-gray-500">
                         {vehicle.deviceId}
                       </span>
                     </div>
                   </div>
                 </TableCell>
 
-                {/* LOCATION */}
                 <TableCell>
                   {vehicle.location}
-                  <div className="text-theme-xs text-gray-400">
+                  <div className="text-xs text-gray-400">
                     {vehicle.lastUpdate}
                   </div>
                 </TableCell>
 
-                {/* SPEED */}
                 <TableCell className="text-center">
                   {vehicle.speed} km/h
                 </TableCell>
 
-                {/* IGNITION */}
                 <TableCell className="text-center">
                   <Badge
                     size="sm"
@@ -103,8 +124,8 @@ export default function XirgoDataTable() {
                       vehicle.ignition === "ON"
                         ? "success"
                         : vehicle.ignition === "IDLE"
-                        ? "warning"
-                        : "error"
+                          ? "warning"
+                          : "error"
                     }
                   >
                     {vehicle.ignition}
@@ -112,6 +133,17 @@ export default function XirgoDataTable() {
                 </TableCell>
               </TableRow>
             ))}
+
+            {tableData.length === 0 && (
+              <TableRow>
+                <td
+                  colSpan={4}
+                  className="px-4 py-6 text-center text-gray-500 text-sm"
+                >
+                  No live vehicles found
+                </td>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
