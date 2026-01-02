@@ -1,46 +1,44 @@
 import { useEffect, useState } from "react";
 import CountryMap from "../map/CountryMap";
-import { getDevices } from "../../api/deviceApi";
 import { Device } from "../../types/device";
 
-export default function FleetMap() {
+interface FleetMapProps {
+  devices?: Device[];
+}
+
+export default function FleetMap({ devices = [] }: FleetMapProps) {
   const [truckCount, setTruckCount] = useState(0);
   const [onlineCount, setOnlineCount] = useState(0);
   const [offlineCount, setOfflineCount] = useState(0);
   const [avgSpeed, setAvgSpeed] = useState(0);
   const [lastUpdate, setLastUpdate] = useState<string>("");
 
-
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getDevices();
-        const trucks = data.filter((d: Device) => d.Online || d.Online === false);
-        setTruckCount(trucks.length);
-        setOnlineCount(trucks.filter((d: Device) => d.Online).length);
-        setOfflineCount(trucks.filter((d: Device) => !d.Online).length);
+    const trucks = devices.filter(
+      (d) => typeof d.Online === "boolean"
+    );
 
-        const avg =
-          trucks.length > 0
-            ? trucks.reduce((sum: number, d: Device) => sum + (d.Speed ?? 0), 0) / trucks.length
-            : 0;
-        setAvgSpeed(Number(avg.toFixed(1)));
+    setTruckCount(trucks.length);
+    setOnlineCount(trucks.filter((d) => d.Online).length);
+    setOfflineCount(trucks.filter((d) => !d.Online).length);
 
-        const last = trucks
-          .map((d: Device) => d.LastContact)
-          .filter(Boolean)
-          .sort((a: string, b: string) => new Date(b!).getTime() - new Date(a!).getTime())[0];
-        setLastUpdate(last ? new Date(last).toLocaleString() : "N/A");
-      } catch (e) {
-        console.error(e);
-      }
-    };
+    const avg =
+      trucks.length > 0
+        ? trucks.reduce((sum, d) => sum + (d.Speed ?? 0), 0) / trucks.length
+        : 0;
 
+    setAvgSpeed(Number(avg.toFixed(1)));
 
-    fetchData();
-    const interval = setInterval(fetchData, 30000);
-    return () => clearInterval(interval);
-  }, []);
+    const last = trucks
+      .map((d) => d.LastContact)
+      .filter(Boolean)
+      .sort(
+        (a, b) =>
+          new Date(b!).getTime() - new Date(a!).getTime()
+      )[0];
+
+    setLastUpdate(last ? new Date(last).toLocaleString() : "N/A");
+  }, [devices]);
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6">
@@ -55,13 +53,12 @@ export default function FleetMap() {
           <span>● Online: {onlineCount} / ● Offline: {offlineCount}</span>
           <span>Avg Speed: {avgSpeed} km/h | Last Update: {lastUpdate}</span>
         </div>
-
       </div>
 
       {/* Map */}
-      <div className="mt-6 overflow-hidden border border-gray-200 rounded-2xl dark:border-gray-800">
-        <div className="h-[264px] w-full">
-          <CountryMap />
+      <div className="mt-6 overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800">
+        <div className="h-[219px] w-full">
+          <CountryMap devices={devices} />
         </div>
       </div>
     </div>

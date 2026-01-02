@@ -6,6 +6,7 @@ import { DashboardFilterProvider } from "../../context/DashboardFilterContext";
 import VehicleTable from "../../components/tables/VehicleTable";
 import FleetMap from "../../components/fleet-widgets/FleetMap";
 import { getDevices } from "../../api/deviceApi";
+import FleetOverviewCard from "../../components/cards/FleetOverviewCard";
 
 export default function Home() {
   const [vehicles, setVehicles] = useState<any[]>([]);
@@ -40,9 +41,14 @@ export default function Home() {
           </div>
 
           {/* Fleet Map */}
-          <div className="col-span-12 xl:col-span-6">
+          <div className="col-span-12 xl:col-span-7">
             <FleetMap devices={vehicles} /> {/* Pass vehicles to map */}
           </div>
+
+          <div className="col-span-12 xl:col-span-5">
+            <FleetOverviewCard />
+          </div>
+
 
           {/* Xirgo Data Table */}
           <div className="col-span-12 xl:col-span-12">
@@ -58,6 +64,6 @@ export default function Home() {
           <MonthlyTarget />
         </div> */}
 
-        {/* <div className="col-span-12">
+{/* <div className="col-span-12">
           <StatisticsChart />
         </div> */}

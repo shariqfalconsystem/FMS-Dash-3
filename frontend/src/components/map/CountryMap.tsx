@@ -1,60 +1,31 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   GoogleMap,
   Marker,
   InfoWindow,
   useJsApiLoader,
 } from "@react-google-maps/api";
-
-import { getDevices } from "../../api/deviceApi";
 import { Device } from "../../types/device";
 
-/* ---------------- MAP CONFIG ---------------- */
+interface CountryMapProps {
+  devices?: Device[];
+}
 
 const containerStyle: React.CSSProperties = {
   width: "100%",
   height: "100%",
 };
 
-const center = {
-  lat: 20.5937,
-  lng: 78.9629,
-};
+const center = { lat: 20.5937, lng: 78.9629 };
 
-export default function CountryMap() {
+export default function CountryMap({ devices = [] }: CountryMapProps) {
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_KEY,
     libraries: ["marker"],
   });
 
-  const [devices, setDevices] = useState<Device[]>([]);
   const [selected, setSelected] = useState<Device | null>(null);
 
-  /* FETCH DEVICES */
-  useEffect(() => {
-    const fetchDevices = async () => {
-      try {
-        const data = await getDevices();
-        setDevices(
-          Array.isArray(data)
-            ? data.filter(
-              (d) =>
-                typeof d.Latitude === "number" &&
-                typeof d.Longitude === "number"
-            )
-            : []
-        );
-      } catch (err) {
-        console.error("Map device fetch failed", err);
-      }
-    };
-
-    fetchDevices();
-    const interval = setInterval(fetchDevices, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
-  /* LOADING STATE */
   if (!isLoaded) {
     return (
       <div className="flex h-full items-center justify-center text-gray-500">
@@ -68,10 +39,7 @@ export default function CountryMap() {
       mapContainerStyle={containerStyle}
       center={center}
       zoom={5}
-      options={{
-        disableDefaultUI: true,
-        zoomControl: true,
-      }}
+      options={{ disableDefaultUI: true, zoomControl: true }}
     >
       {devices.map((device, index) => (
         <Marker
@@ -89,7 +57,6 @@ export default function CountryMap() {
         />
       ))}
 
-
       {selected && (
         <InfoWindow
           position={{
@@ -102,15 +69,10 @@ export default function CountryMap() {
             <p className="font-semibold">🚚 Truck</p>
             <p>Status: {selected.Online ? "Online" : "Offline"}</p>
             <p>Speed: {selected.Speed ?? 0} km/h</p>
-            <p className="text-xs text-gray-500">
-              Last Update:{" "}
-              {selected.LastContact
-                ? new Date(selected.LastContact).toLocaleString()
-                : "N/A"}
-            </p>
           </div>
         </InfoWindow>
       )}
     </GoogleMap>
   );
 }
+

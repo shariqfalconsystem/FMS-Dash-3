@@ -1,54 +1,48 @@
 import { useEffect, useState } from "react";
 import {
   Truck,
-  Route,
-  PauseCircle,
-  Fuel,
-  Bell,
-  UserCheck,
+  Activity,
+  AlertTriangle,
+  Wrench,
+  ShieldAlert,
 } from "lucide-react";
 
-import StatCard, { TrendDirection } from "./StatCard";
+import StatCard from "./StatCard";
 import { getDevices } from "../../api/deviceApi";
-import { getFuelStats } from "../../api/fuelApi";
 import { getAlertsStats } from "../../api/alertApi";
-import { getDriverStats } from "../../api/driverApi";
 import { useDashboardFilter } from "../../context/DashboardFilterContext";
 
 /* ---------- TYPES ---------- */
 
-type TrendResult = {
-  value: string;
-  direction: TrendDirection;
+type Device = {
+  Online?: boolean;
+  Speed?: number;
+  IgnitionOn?: boolean;
+  maintenanceDue?: boolean;
 };
 
 export default function StatCardGrid() {
   const dashboardFilter = useDashboardFilter();
   const setFilter = dashboardFilter?.setFilter ?? (() => {});
 
-  const [devices, setDevices] = useState<any[]>([]);
-  const [fuel, setFuel] = useState<any>({});
+  const [devices, setDevices] = useState<Device[]>([]);
   const [alerts, setAlerts] = useState<any>({});
-  const [drivers, setDrivers] = useState<any>({});
 
   /* ---------- DATA FETCH ---------- */
 
   const fetchData = async () => {
     try {
-      const [d, f, a, dr] = await Promise.all([
+      const [d, a] = await Promise.all([
         getDevices(),
-        getFuelStats(),
         getAlertsStats(),
-        getDriverStats(),
       ]);
 
       setDevices(Array.isArray(d) ? d : []);
-      setFuel(f || {});
       setAlerts(a || {});
-      setDrivers(dr || {});
     } catch (error) {
       console.error("❌ Dashboard fetch failed", error);
       setDevices([]);
+      setAlerts({});
     }
   };
 
@@ -64,29 +58,23 @@ export default function StatCardGrid() {
 
   const totalVehicles = devices.length;
 
-  const activeTrips = devices.filter(
-    (d) => d?.Online && d?.Speed > 0 && d?.IgnitionOn
+  const activeVehicles = devices.filter(
+    (d) => d?.Online && d?.IgnitionOn
   ).length;
 
-  const idleVehicles = devices.filter(
-    (d) => d?.Online && d?.Speed === 0
+  const criticalAlerts = alerts?.critical ?? 0;
+
+  const maintenanceDue = devices.filter(
+    (d) => d?.maintenanceDue
   ).length;
 
-  /* ---------- TREND CALCULATOR (STRICTLY TYPED) ---------- */
-
-  const trend = (today = 0, yesterday = 0): TrendResult => {
-    const diff = today - yesterday;
-
-    return {
-      value: `${diff >= 0 ? "+" : ""}${diff}`,
-      direction: diff >= 0 ? "up" : "down",
-    };
-  };
+  const incidentsLast30Days = alerts?.incidents30d ?? 0;
 
   /* ---------- UI ---------- */
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-0">
+      {/* 1. TOTAL VEHICLES */}
       <StatCard
         title="Total Vehicles"
         value={totalVehicles}
@@ -94,48 +82,36 @@ export default function StatCardGrid() {
         onClick={() => setFilter("ALL")}
       />
 
+      {/* 2. ACTIVE VEHICLES */}
       <StatCard
-        title="Active Trips"
-        value={activeTrips}
-        icon={Route}
-        trend={trend(activeTrips, idleVehicles).value}
-        trendDirection={trend(activeTrips, idleVehicles).direction}
+        title="Active Vehicles"
+        value={`${activeVehicles} / ${totalVehicles}`}
+        icon={Activity}
         onClick={() => setFilter("ACTIVE")}
       />
 
+      {/* 3. CRITICAL ALERTS */}
       <StatCard
-        title="Idle Vehicles"
-        value={idleVehicles}
-        icon={PauseCircle}
-        trend={trend(idleVehicles, activeTrips).value}
-        trendDirection={trend(idleVehicles, activeTrips).direction}
-        onClick={() => setFilter("IDLE")}
-      />
-
-      <StatCard
-        title="Avg Fuel"
-        value={`${fuel.todayAvg ?? 0} km/l`}
-        icon={Fuel}
-        trend={trend(fuel.todayAvg, fuel.yesterdayAvg).value}
-        trendDirection={trend(fuel.todayAvg, fuel.yesterdayAvg).direction}
-      />
-
-      <StatCard
-        title="Alerts Today"
-        value={alerts.today ?? 0}
-        icon={Bell}
-        trend={trend(alerts.today, alerts.yesterday).value}
-        trendDirection={trend(alerts.today, alerts.yesterday).direction}
+        title="Critical Alerts"
+        value={criticalAlerts}
+        icon={AlertTriangle}
         onClick={() => setFilter("ALERTS")}
       />
 
+      {/* 4. MAINTENANCE DUE */}
       <StatCard
-        title="Drivers On Duty"
-        value={drivers.today ?? 0}
-        icon={UserCheck}
-        trend={trend(drivers.today, drivers.yesterday).value}
-        trendDirection={trend(drivers.today, drivers.yesterday).direction}
-        onClick={() => setFilter("DRIVERS")}
+        title="Maintenance Due"
+        value={maintenanceDue}
+        icon={Wrench}
+        onClick={() => setFilter("MAINTENANCE")}
+      />
+
+      {/* 5. INCIDENTS */}
+      <StatCard
+        title="Incidents (30 Days)"
+        value={incidentsLast30Days}
+        icon={ShieldAlert}
+        onClick={() => setFilter("INCIDENTS")}
       />
     </div>
   );
