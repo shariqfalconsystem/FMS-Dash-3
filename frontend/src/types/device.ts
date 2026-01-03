@@ -5,5 +5,6 @@ export interface Device {
   Speed: number | null;
   Online: boolean;
   LastContact: string | null;
+  maintenanceDue?: boolean;
 }
 

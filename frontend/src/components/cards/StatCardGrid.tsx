@@ -23,7 +23,7 @@ type Device = {
 
 export default function StatCardGrid() {
   const dashboardFilter = useDashboardFilter();
-  const setFilter = dashboardFilter?.setFilter ?? (() => {});
+  const setFilter = dashboardFilter?.setFilter ?? (() => { });
 
   const [devices, setDevices] = useState<Device[]>([]);
   const [alerts, setAlerts] = useState<any>({});
@@ -79,6 +79,11 @@ export default function StatCardGrid() {
         title="Total Vehicles"
         value={totalVehicles}
         icon={Truck}
+        color={{
+          bg: "bg-blue-100 dark:bg-blue-500/10",
+          icon: "text-blue-600",
+          value: "text-blue-700 dark:text-blue-400",
+        }}
         onClick={() => setFilter("ALL")}
       />
 
@@ -87,6 +92,11 @@ export default function StatCardGrid() {
         title="Active Vehicles"
         value={`${activeVehicles} / ${totalVehicles}`}
         icon={Activity}
+        color={{
+          bg: "bg-green-100 dark:bg-green-500/10",
+          icon: "text-green-600",
+          value: "text-green-700 dark:text-green-400",
+        }}
         onClick={() => setFilter("ACTIVE")}
       />
 
@@ -95,6 +105,11 @@ export default function StatCardGrid() {
         title="Critical Alerts"
         value={criticalAlerts}
         icon={AlertTriangle}
+        color={{
+          bg: "bg-red-100 dark:bg-red-500/10",
+          icon: "text-red-600",
+          value: "text-red-700 dark:text-red-400",
+        }}
         onClick={() => setFilter("ALERTS")}
       />
 
@@ -103,6 +118,11 @@ export default function StatCardGrid() {
         title="Maintenance Due"
         value={maintenanceDue}
         icon={Wrench}
+        color={{
+          bg: "bg-orange-100 dark:bg-orange-500/10",
+          icon: "text-orange-600",
+          value: "text-orange-700 dark:text-orange-400",
+        }}
         onClick={() => setFilter("MAINTENANCE")}
       />
 
@@ -111,6 +131,11 @@ export default function StatCardGrid() {
         title="Incidents (30 Days)"
         value={incidentsLast30Days}
         icon={ShieldAlert}
+        color={{
+          bg: "bg-gray-100 dark:bg-gray-800",
+          icon: "text-gray-600 dark:text-gray-300",
+          value: "text-gray-700 dark:text-gray-300",
+        }}
         onClick={() => setFilter("INCIDENTS")}
       />
     </div>

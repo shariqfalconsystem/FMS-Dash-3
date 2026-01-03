@@ -81,12 +81,12 @@ export default function FleetOverviewCard() {
           <p className="text-sm text-gray-500">Total Vehicles</p>
         </div>
 
-        <div className="text-right">
+        {/* <div className="text-right">
           <p className="text-3xl font-bold text-green-600">
             {efficiency}%
           </p>
           <p className="text-sm text-gray-500">Efficiency</p>
-        </div>
+        </div> */}
       </div>
 
       {/* STATUS ROW */}

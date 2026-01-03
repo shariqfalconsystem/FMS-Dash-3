@@ -151,53 +151,143 @@
 //   );
 // }
 
-import { AlertTriangle, Wrench } from "lucide-react";
+// import { AlertTriangle, Wrench } from "lucide-react";
 
-const maintenanceSummary = [
-  { label: "Overdue", value: 2, color: "text-red-600" },
-  { label: "Due Soon", value: 5, color: "text-orange-500" },
-  { label: "In Progress", value: 3, color: "text-blue-600" },
-  { label: "Completed Today", value: 4, color: "text-green-600" },
+// const maintenanceSummary = [
+//   { label: "Overdue", value: 2, color: "text-red-600" },
+//   { label: "Due Soon", value: 5, color: "text-orange-500" },
+//   { label: "In Progress", value: 3, color: "text-blue-600" },
+//   { label: "Completed Today", value: 4, color: "text-green-600" },
+// ];
+
+// const criticalMaintenance = [
+//   {
+//     vehicle: "TRK-004",
+//     issue: "Annual Safety Inspection",
+//     status: "Overdue",
+//     priority: "High",
+//   },
+//   {
+//     vehicle: "TRK-003",
+//     issue: "Transmission Leak",
+//     status: "Scheduled",
+//     priority: "Critical",
+//   },
+//   {
+//     vehicle: "TRK-002",
+//     issue: "Brake Repair",
+//     status: "In Progress",
+//     priority: "High",
+//   },
+// ];
+
+// export default function DashboardMaintenance() {
+//   return (
+//     <div className="rounded-2xl border bg-white p-5 dark:bg-white/[0.03]">
+//       {/* Header */}
+//       <div className="mb-4 flex items-center justify-between">
+//         <h3 className="flex items-center gap-2 text-lg font-semibold">
+//           <Wrench className="h-5 w-5" />
+//           Maintenance Overview
+//         </h3>
+//         <a href="/maintenance" className="text-sm text-blue-600">
+//           View All
+//         </a>
+//       </div>
+
+//       {/* Summary */}
+//       <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+//         {maintenanceSummary.map(item => (
+//           <div
+//             key={item.label}
+//             className="rounded-xl border p-3 text-center"
+//           >
+//             <p className={`text-2xl font-bold ${item.color}`}>
+//               {item.value}
+//             </p>
+//             <p className="text-xs text-gray-500">{item.label}</p>
+//           </div>
+//         ))}
+//       </div>
+
+//       {/* Critical List */}
+//       <div className="space-y-3">
+//         {criticalMaintenance.map((item, i) => (
+//           <div
+//             key={i}
+//             className="flex items-center justify-between rounded-lg border p-3"
+//           >
+//             <div>
+//               <p className="font-medium">{item.vehicle}</p>
+//               <p className="text-sm text-gray-500">{item.issue}</p>
+//             </div>
+
+//             <div className="text-right">
+//               <p className="text-sm font-medium">{item.status}</p>
+//               <p className="text-xs text-red-600">{item.priority}</p>
+//             </div>
+//           </div>
+//         ))}
+//       </div>
+
+//       {/* Warning */}
+//       <div className="mt-4 flex items-center gap-2 text-xs text-red-600">
+//         <AlertTriangle className="h-4 w-4" />
+//         Vehicles with overdue maintenance may be non-compliant
+//       </div>
+//     </div>
+//   );
+// }
+
+import { Route, AlertTriangle } from "lucide-react";
+
+/* ---------- SUMMARY ---------- */
+const routeSummary = [
+  { label: "Active Routes", value: 8, color: "text-green-600" },
+  { label: "Delayed", value: 2, color: "text-orange-600" },
+  { label: "Deviations", value: 1, color: "text-red-600" },
+  { label: "Completed Today", value: 12, color: "text-blue-600" },
 ];
 
-const criticalMaintenance = [
+/* ---------- CRITICAL ROUTES ---------- */
+const criticalRoutes = [
   {
     vehicle: "TRK-004",
-    issue: "Annual Safety Inspection",
-    status: "Overdue",
-    priority: "High",
+    route: "Delhi → Jaipur",
+    status: "Delayed",
+    issue: "Traffic congestion",
   },
   {
-    vehicle: "TRK-003",
-    issue: "Transmission Leak",
-    status: "Scheduled",
-    priority: "Critical",
+    vehicle: "TRK-007",
+    route: "Mumbai → Pune",
+    status: "Deviation",
+    issue: "Off planned route",
   },
   {
     vehicle: "TRK-002",
-    issue: "Brake Repair",
-    status: "In Progress",
-    priority: "High",
+    route: "Bengaluru → Chennai",
+    status: "Delayed",
+    issue: "Low average speed",
   },
 ];
 
-export default function DashboardMaintenance() {
+export default function DashboardRoutesOverview() {
   return (
     <div className="rounded-2xl border bg-white p-5 dark:bg-white/[0.03]">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <h3 className="flex items-center gap-2 text-lg font-semibold">
-          <Wrench className="h-5 w-5" />
-          Maintenance Overview
+          <Route className="h-5 w-5" />
+          Route Overview
         </h3>
-        <a href="/maintenance" className="text-sm text-blue-600">
+        <a href="/routes" className="text-sm text-blue-600">
           View All
         </a>
       </div>
 
       {/* Summary */}
       <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {maintenanceSummary.map(item => (
+        {routeSummary.map(item => (
           <div
             key={item.label}
             className="rounded-xl border p-3 text-center"
@@ -210,21 +300,29 @@ export default function DashboardMaintenance() {
         ))}
       </div>
 
-      {/* Critical List */}
+      {/* Critical Routes */}
       <div className="space-y-3">
-        {criticalMaintenance.map((item, i) => (
+        {criticalRoutes.map((item, i) => (
           <div
             key={i}
             className="flex items-center justify-between rounded-lg border p-3"
           >
             <div>
               <p className="font-medium">{item.vehicle}</p>
-              <p className="text-sm text-gray-500">{item.issue}</p>
+              <p className="text-sm text-gray-500">{item.route}</p>
             </div>
 
             <div className="text-right">
-              <p className="text-sm font-medium">{item.status}</p>
-              <p className="text-xs text-red-600">{item.priority}</p>
+              <p
+                className={`text-sm font-medium ${
+                  item.status === "Deviation"
+                    ? "text-red-600"
+                    : "text-orange-600"
+                }`}
+              >
+                {item.status}
+              </p>
+              <p className="text-xs text-gray-500">{item.issue}</p>
             </div>
           </div>
         ))}
@@ -233,7 +331,7 @@ export default function DashboardMaintenance() {
       {/* Warning */}
       <div className="mt-4 flex items-center gap-2 text-xs text-red-600">
         <AlertTriangle className="h-4 w-4" />
-        Vehicles with overdue maintenance may be non-compliant
+        Route deviations or delays may impact delivery commitments
       </div>
     </div>
   );

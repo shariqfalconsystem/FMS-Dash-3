@@ -7,6 +7,11 @@ interface StatCardProps {
   title: string;
   value: string | number;
   icon: ComponentType<{ className?: string }>;
+  color?: {
+    bg: string;
+    icon: string;
+    value: string;
+  };
   trend?: ReactNode;
   trendDirection?: TrendDirection;
   onClick?: () => void;
@@ -16,6 +21,7 @@ export default function StatCard({
   title,
   value,
   icon: Icon,
+  color,
   trend,
   trendDirection = "up",
   onClick,
@@ -34,13 +40,25 @@ export default function StatCard({
           {title}
         </span>
 
-        <div className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-xl dark:bg-gray-800">
-          <Icon className="size-5 text-gray-800 dark:text-white/90" />
+        <div
+          className={`flex h-10 w-10 items-center justify-center rounded-xl
+            ${color?.bg ?? "bg-gray-100 dark:bg-gray-800"}
+          `}
+        >
+          <Icon
+            className={`size-5 ${
+              color?.icon ?? "text-gray-800 dark:text-white/90"
+            }`}
+          />
         </div>
       </div>
 
       {/* VALUE */}
-      <h4 className="mt-3 font-bold text-gray-800 text-title-sm dark:text-white/90">
+      <h4
+        className={`mt-3 font-bold text-title-sm ${
+          color?.value ?? "text-gray-800 dark:text-white/90"
+        }`}
+      >
         {value}
       </h4>
 

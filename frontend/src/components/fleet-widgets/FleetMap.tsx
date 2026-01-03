@@ -48,10 +48,32 @@ export default function FleetMap({ devices = [] }: FleetMapProps) {
           Live Fleet Map
         </h3>
 
-        <div className="mt-2 flex gap-6 text-sm text-gray-600 dark:text-gray-400">
-          <span>🚚 Trucks: {truckCount}</span>
-          <span>● Online: {onlineCount} / ● Offline: {offlineCount}</span>
-          <span>Avg Speed: {avgSpeed} km/h | Last Update: {lastUpdate}</span>
+        <div className="mt-2 flex flex-wrap gap-6 text-sm">
+          {/* Total Trucks */}
+          <span className="text-blue-700 dark:text-blue-400">
+            🚚 Trucks: <strong>{truckCount}</strong>
+          </span>
+
+          {/* Online / Offline */}
+          <span>
+            <span className="text-green-700 dark:text-green-400">
+              ● Online: <strong>{onlineCount}</strong>
+            </span>
+            <span className="mx-1 text-gray-400">/</span>
+            <span className="text-red-700 dark:text-red-400">
+              ● Offline: <strong>{offlineCount}</strong>
+            </span>
+          </span>
+
+          {/* Avg Speed & Update */}
+          <span className="text-gray-600 dark:text-gray-400">
+            Avg Speed:{" "}
+            <span className="font-semibold text-gray-800 dark:text-gray-200">
+              {avgSpeed} km/h
+            </span>
+            {" | "}
+            Last Update: {lastUpdate}
+          </span>
         </div>
       </div>
 
