@@ -8,7 +8,7 @@ import {
   HorizontaLDots,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
-import { AlertTriangle, BarChart3, CalendarDays, CarFront, Earth, FileText, Route, Settings, TabletSmartphone, Truck, User, Wrench, } from "lucide-react";
+import { AlertTriangle, BarChart3, CarFront, Earth, FileText, Route, Settings, Truck, Wrench, } from "lucide-react";
 
 type NavItem = {
   name: string;
@@ -58,7 +58,7 @@ const navItems: NavItem[] = [
     path: "/alerts" 
   },
   {
-    name: "Documents (View)",
+    name: "Documents Center",
     icon: <FileText />,
     path: "/document-center",
   },
@@ -276,20 +276,6 @@ const AppSidebar: React.FC = () => {
         <Link to="/">
           {isExpanded || isHovered || isMobileOpen ? (
             <>
-              {/* <img
-                className="dark:hidden"
-                src="/images/logo/logo.svg"
-                alt="Logo"
-                width={120}
-                height={40}
-              />
-              <img
-                className="hidden dark:block"
-                src="/images/logo/logo-dark.svg"
-                alt="Logo"
-                width={150}
-                height={40}
-              /> */}
               <h1 className="text-2xl font-semibold text-center text-blue-800">FMS Dashboard</h1>
             </>
           ) : (
@@ -313,7 +299,7 @@ const AppSidebar: React.FC = () => {
                   }`}
               >
                 {isExpanded || isHovered || isMobileOpen ? (
-                  "Menu"
+                  ""
                 ) : (
                   <HorizontaLDots className="size-6" />
                 )}
