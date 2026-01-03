@@ -1,9 +1,7 @@
-import PageMeta from "../../components/common/PageMeta";
 import { useEffect, useState } from "react";
 import XirgoDataTable from "../../components/fleet-widgets/XirgoDataTable";
 import StatCardGrid from "../../components/cards/StatCardGrid";
 import { DashboardFilterProvider } from "../../context/DashboardFilterContext";
-import VehicleTable from "../../components/tables/VehicleTable";
 import FleetMap from "../../components/fleet-widgets/FleetMap";
 import { getDevices } from "../../api/deviceApi";
 import FleetOverviewCard from "../../components/cards/FleetOverviewCard";
@@ -28,16 +26,11 @@ export default function Home() {
 
   return (
     <>
-      <PageMeta
-        title="React.js Ecommerce Dashboard | FMS"
-        description="This is React.js Ecommerce Dashboard page for FMS"
-      />
       <DashboardFilterProvider>
         <div className="grid grid-cols-12 gap-4 md:gap-6">
           {/* Stats & Vehicle Table */}
           <div className="col-span-12 space-y-6 xl:col-span-12">
             <StatCardGrid />
-            <VehicleTable vehicles={vehicles} />
           </div>
 
           {/* Fleet Map */}
@@ -59,11 +52,3 @@ export default function Home() {
     </>
   );
 }
-
-{/* <div className="col-span-12 xl:col-span-5">
-          <MonthlyTarget />
-        </div> */}
-
-{/* <div className="col-span-12">
-          <StatisticsChart />
-        </div> */}

@@ -17,7 +17,9 @@ import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
 import DocumentCenter from "./pages/DocumentCenter";
 import Vehicle from "./pages/Vehicles";
-import FleetTracking from "./pages/LiveTracking";
+// import UserManagement from "./pages/UserManagement";
+// import FleetTracking from "./pages/FleetTracking";
+// import SupportsPage from "./pages/Supports";
 
 export default function App() {
   
@@ -36,9 +38,18 @@ export default function App() {
 
 
             {/* Others Page */}
-            <Route path="/fleet-tracking" element={<FleetTracking />} />
+            {/* <Route path="/fleet-tracking" element={<FleetTracking />} />
+            <Route path="/events" element={<Events />} />
+            <Route path="/trips" element={<Trips />} />
+            <Route path="/driver" element={<Driver />} />
+            <Route path="/devices" element={<Devices />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="user-management" element={<UserManagement />} />
+            <Route path="/supports" element={<SupportsPage />} /> */}
             <Route path="/vehicles" element={<Vehicle />} />
             <Route path="/document-center" element={<DocumentCenter />} />
+            <Route path="fleet/notifications" element={<NotificationsPage />} />
+            <Route path="/vehicles" element={<Vehicles />} />
 
             {/* Forms */}
             <Route path="/form-elements" element={<FormElements />} />
