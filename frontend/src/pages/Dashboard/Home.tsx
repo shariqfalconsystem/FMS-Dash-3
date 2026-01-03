@@ -1,4 +1,3 @@
-import PageMeta from "../../components/common/PageMeta";
 import { useEffect, useState } from "react";
 import XirgoDataTable from "../../components/fleet-widgets/XirgoDataTable";
 import StatCardGrid from "../../components/cards/StatCardGrid";
@@ -27,10 +26,6 @@ export default function Home() {
 
   return (
     <>
-      <PageMeta
-        title="React.js Ecommerce Dashboard | FMS"
-        description="This is React.js Ecommerce Dashboard page for FMS"
-      />
       <DashboardFilterProvider>
         <div className="grid grid-cols-12 gap-4 md:gap-6">
           {/* Stats & Vehicle Table */}

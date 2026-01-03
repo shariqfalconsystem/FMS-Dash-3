@@ -21,7 +21,7 @@ import Home from "./pages/Dashboard/Home";
 // import Devices from "./pages/Devices";
 // import Settings from "./pages/Settings";
 import DocumentCenter from "./pages/DocumentCenter";
-import Vehicle from "./pages/Vehicles";
+import { Vehicles } from "./pages/Vehicles";
 import NotificationsPage from "./pages/NotificationsPage";
 // import UserManagement from "./pages/UserManagement";
 // import FleetTracking from "./pages/FleetTracking";
@@ -53,7 +53,7 @@ export default function App() {
             <Route path="/supports" element={<SupportsPage />} /> */}
             <Route path="/document-center" element={<DocumentCenter />} />
             <Route path="fleet/notifications" element={<NotificationsPage />} />
-            <Route path="/vehicles" element={<Vehicle />} />
+            <Route path="/vehicles" element={<Vehicles />} />
 
             {/* Forms */}
             <Route path="/form-elements" element={<FormElements />} />
