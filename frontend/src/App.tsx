@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router";
 import SignIn from "./pages/AuthPages/SignIn";
-import SignUp from "./pages/AuthPages/SignUp";
 import NotFound from "./pages/OtherPage/NotFound";
 import UserProfiles from "./pages/UserProfiles";
 import Videos from "./pages/UiElements/Videos";
@@ -11,13 +10,21 @@ import Avatars from "./pages/UiElements/Avatars";
 import Buttons from "./pages/UiElements/Buttons";
 import LineChart from "./pages/Charts/LineChart";
 import BarChart from "./pages/Charts/BarChart";
-import Calendar from "./pages/Calendar";
 import BasicTables from "./pages/Tables/BasicTables";
 import FormElements from "./pages/Forms/FormElements";
-import Blank from "./pages/Blank";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
+// import Events from "./pages/Events";
+// import Trips from "./pages/Trips";
+// import Driver from "./pages/Driver";
+// import Devices from "./pages/Devices";
+// import Settings from "./pages/Settings";
+import DocumentCenter from "./pages/DocumentCenter";
+import Vehicle from "./pages/Vehicles";
+// import UserManagement from "./pages/UserManagement";
+// import FleetTracking from "./pages/FleetTracking";
+// import SupportsPage from "./pages/Supports";
 
 export default function App() {
   return (
@@ -29,10 +36,22 @@ export default function App() {
           <Route element={<AppLayout />}>
             <Route index path="/" element={<Home />} />
 
-            {/* Others Page */}
+
+            {/* user profile route page */}
             <Route path="/profile" element={<UserProfiles />} />
-            {/* <Route path="/calendar" element={<Calendar />} /> */}
-            <Route path="/blank" element={<Blank />} />
+
+
+            {/* Others Page */}
+            {/* <Route path="/fleet-tracking" element={<FleetTracking />} />
+            <Route path="/events" element={<Events />} />
+            <Route path="/trips" element={<Trips />} />
+            <Route path="/driver" element={<Driver />} />
+            <Route path="/devices" element={<Devices />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="user-management" element={<UserManagement />} />
+            <Route path="/supports" element={<SupportsPage />} /> */}
+            <Route path="/vehicles" element={<Vehicle />} />
+            <Route path="/document-center" element={<DocumentCenter />} />
 
             {/* Forms */}
             <Route path="/form-elements" element={<FormElements />} />
@@ -55,7 +74,6 @@ export default function App() {
 
           {/* Auth Layout */}
           <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
 
           {/* Fallback Route */}
           <Route path="*" element={<NotFound />} />
