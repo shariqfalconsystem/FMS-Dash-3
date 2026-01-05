@@ -15,19 +15,16 @@ import FormElements from "./pages/Forms/FormElements";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
-// import Events from "./pages/Events";
-// import Trips from "./pages/Trips";
-// import Driver from "./pages/Driver";
-// import Devices from "./pages/Devices";
-// import Settings from "./pages/Settings";
 import DocumentCenter from "./pages/DocumentCenter";
 import { Vehicles } from "./pages/Vehicles";
 import NotificationsPage from "./pages/NotificationsPage";
+import LiveTracking from "./pages/LiveTracking";
 // import UserManagement from "./pages/UserManagement";
 // import FleetTracking from "./pages/FleetTracking";
 // import SupportsPage from "./pages/Supports";
 
 export default function App() {
+  
   return (
     <>
       <Router>
@@ -51,6 +48,7 @@ export default function App() {
             <Route path="/settings" element={<Settings />} />
             <Route path="user-management" element={<UserManagement />} />
             <Route path="/supports" element={<SupportsPage />} /> */}
+            <Route path="/live-tracking" element={<LiveTracking />} />
             <Route path="/document-center" element={<DocumentCenter />} />
             <Route path="fleet/notifications" element={<NotificationsPage />} />
             <Route path="/vehicles" element={<Vehicles />} />
