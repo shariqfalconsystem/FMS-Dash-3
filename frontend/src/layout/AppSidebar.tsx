@@ -26,7 +26,7 @@ const navItems: NavItem[] = [
   {
     name: "Live Tracking",
     icon: <Route />,
-    path: "/fleet-tracking",
+    path: "/live-tracking",
   },
   {
     name: "Vehicles",

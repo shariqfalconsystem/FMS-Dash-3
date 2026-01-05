@@ -16,7 +16,9 @@ import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
 import DocumentCenter from "./pages/DocumentCenter";
-import Vehicle from "./pages/Vehicles";
+import { Vehicles } from "./pages/Vehicles";
+import NotificationsPage from "./pages/NotificationsPage";
+import LiveTracking from "./pages/LiveTracking";
 // import UserManagement from "./pages/UserManagement";
 // import FleetTracking from "./pages/FleetTracking";
 // import SupportsPage from "./pages/Supports";
@@ -46,7 +48,7 @@ export default function App() {
             <Route path="/settings" element={<Settings />} />
             <Route path="user-management" element={<UserManagement />} />
             <Route path="/supports" element={<SupportsPage />} /> */}
-            <Route path="/vehicles" element={<Vehicle />} />
+            <Route path="/live-tracking" element={<LiveTracking />} />
             <Route path="/document-center" element={<DocumentCenter />} />
             <Route path="fleet/notifications" element={<NotificationsPage />} />
             <Route path="/vehicles" element={<Vehicles />} />
