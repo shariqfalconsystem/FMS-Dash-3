@@ -8,7 +8,7 @@ const AppHeader: React.FC = () => {
   const [notificationCount] = useState(3);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true); // 🔹 icon rotation state
 
-  const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
+  const { toggleSidebar, toggleMobileSidebar } = useSidebar();
 
   const inputRef = useRef<HTMLInputElement>(null);
 
