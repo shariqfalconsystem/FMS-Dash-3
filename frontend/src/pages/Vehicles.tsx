@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import { Vehicle } from "../types/vehicle";
-import { VehicleTable } from "../components/vehicle/VehicleTable";
-import { VehicleCard } from "../components/vehicle/VehicleCard";
 
 const initialVehicles: Vehicle[] = [
   {
@@ -110,16 +108,6 @@ export const Vehicles: React.FC = () => {
           </button>
         </div>
       </div>
-
-      {view === "table" ? (
-        <VehicleTable vehicles={vehicles} />
-      ) : (
-        <div className="flex flex-wrap">
-          {vehicles.map((v) => (
-            <VehicleCard key={v.id} vehicle={v} />
-          ))}
-        </div>
-      )}
     </div>
   );
 };
