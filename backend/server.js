@@ -100,5 +100,5 @@ app.get("/api/v1/drivers", async (req, res) => {
 
 
 app.listen(PORT, () => {
-  console.log(`🚀 Backend running at http://localhost:${PORT}`);
+  console.log(`Backend running at http://localhost:${PORT}`);
 });
