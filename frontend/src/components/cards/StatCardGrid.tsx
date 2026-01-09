@@ -57,7 +57,7 @@ export default function StatCardGrid() {
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 30000);
+    const interval = setInterval(fetchData, 3000000);
     return () => clearInterval(interval);
   }, []);
 
