@@ -1,91 +1,71 @@
-// react plugin for creating vector maps
 import { VectorMap } from "@react-jvectormap/core";
 import { worldMill } from "@react-jvectormap/world";
+import { Device } from "../../types/device";
 
-// Define the component props
 interface CountryMapProps {
+  devices: Device[];
   mapColor?: string;
 }
 
-const CountryMap: React.FC<CountryMapProps> = ({ mapColor }) => {
+const CountryMap: React.FC<CountryMapProps> = ({ devices, mapColor }) => {
+  // Convert devices → vector map markers
+  const markers = devices
+    .filter(d => d.Latitude && d.Longitude)
+    .map(d => ({
+      latLng: [d.Latitude!, d.Longitude!] as [number, number],
+      name: d.VehicleNumber || d.DeviceID,
+      style: {
+        fill: d.Online ? "#22c55e" : "#ef4444", // green / red
+        borderWidth: 1,
+        borderColor: "#ffffff",
+      },
+    }));
+
   return (
     <VectorMap
       map={worldMill}
       backgroundColor="transparent"
+
+      markers={markers}
+      markersSelectable={true}
+
       markerStyle={{
         initial: {
-          fill: "#465FFF",
-          r: 4, // Custom radius for markers
-        } as any, // Type assertion to bypass strict CSS property checks
+          r: 4,
+        } as any,
+        hover: {
+          r: 6,
+        } as any,
       }}
-      markersSelectable={true}
-      markers={[
-        {
-          latLng: [37.2580397, -104.657039],
-          name: "United States",
-          style: {
-            fill: "#465FFF",
-            borderWidth: 1,
-            borderColor: "white",
-            stroke: "#383f47",
-          },
-        },
-        {
-          latLng: [20.7504374, 73.7276105],
-          name: "India",
-          style: { fill: "#465FFF", borderWidth: 1, borderColor: "white" },
-        },
-        {
-          latLng: [53.613, -11.6368],
-          name: "United Kingdom",
-          style: { fill: "#465FFF", borderWidth: 1, borderColor: "white" },
-        },
-        {
-          latLng: [-25.0304388, 115.2092761],
-          name: "Sweden",
-          style: {
-            fill: "#465FFF",
-            borderWidth: 1,
-            borderColor: "white",
-            strokeOpacity: 0,
-          },
-        },
-      ]}
+
       zoomOnScroll={false}
       zoomMax={12}
       zoomMin={1}
       zoomAnimate={true}
       zoomStep={1.5}
+
       regionStyle={{
         initial: {
           fill: mapColor || "#D0D5DD",
           fillOpacity: 1,
-          fontFamily: "Outfit",
           stroke: "none",
-          strokeWidth: 0,
-          strokeOpacity: 0,
         },
         hover: {
+          fill: "#465fff",
           fillOpacity: 0.7,
           cursor: "pointer",
-          fill: "#465fff",
-          stroke: "none",
         },
         selected: {
           fill: "#465FFF",
         },
-        selectedHover: {},
       }}
+
       regionLabelStyle={{
         initial: {
           fill: "#35373e",
-          fontWeight: 500,
           fontSize: "13px",
-          stroke: "none",
+          fontWeight: 500,
         },
-        hover: {},
-        selected: {},
-        selectedHover: {},
       }}
     />
   );

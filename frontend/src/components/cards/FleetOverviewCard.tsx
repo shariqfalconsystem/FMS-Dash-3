@@ -11,7 +11,8 @@ export default function FleetOverviewCard() {
     try {
       setLoading(true);
       const data = await getDevices();
-      setDevices(Array.isArray(data) ? data : []);
+      // const devicesList = Array.isArray(data?.list) ? data.list : [];
+      setDevices(data);
     } catch (err) {
       console.error("Fleet overview fetch failed", err);
       setDevices([]);

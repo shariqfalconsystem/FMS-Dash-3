@@ -13,9 +13,12 @@ export default function Home() {
     const fetchVehicles = async () => {
       try {
         const data = await getDevices();
-        setVehicles(Array.isArray(data) ? data : []);
+        // ✅ extract list safely
+        // const vehiclesList = Array.isArray(data?.list) ? data.list : [];
+        setVehicles(data);
       } catch (err) {
         console.error("Failed to fetch devices:", err);
+        setVehicles([]);
       }
     };
 
@@ -23,6 +26,8 @@ export default function Home() {
     const interval = setInterval(fetchVehicles, 30000); // auto-refresh every 30s
     return () => clearInterval(interval);
   }, []);
+
+
 
   return (
     <>

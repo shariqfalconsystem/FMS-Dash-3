@@ -37,7 +37,10 @@ export default function StatCardGrid() {
         getAlertsStats(),
       ]);
 
-      setDevices(Array.isArray(d) ? d : []);
+      // setDevices(Array.isArray(d) ? d : []);
+      setDevices(d);
+      console.log("Alerts data:", a);
+      console.log("device data:", d);
       setAlerts(a || {});
     } catch (error) {
       console.error("❌ Dashboard fetch failed", error);
@@ -45,6 +48,10 @@ export default function StatCardGrid() {
       setAlerts({});
     }
   };
+  useEffect(() => {
+    console.log("Devices count:", devices.length);
+    console.log("First device:", devices[0]);
+  }, [devices]);
 
   /* ---------- AUTO REFRESH ---------- */
 
