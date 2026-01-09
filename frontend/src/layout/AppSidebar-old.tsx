@@ -8,7 +8,6 @@ import {
   HorizontaLDots,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
-import SidebarWidget from "./SidebarWidget";
 import { AlertTriangleIcon, CalendarMinus2, CarFront, Fuel, HeartPlus, MapPin, UserRound, WifiPen } from "lucide-react";
 
 type NavItem = {
