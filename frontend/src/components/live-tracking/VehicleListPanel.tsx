@@ -35,19 +35,39 @@ export default function VehicleListPanel({
     switch (activeTab) {
       case "Running":
         return devices.filter(d => d.Online && (d.Speed ?? 0) > 0);
+
       case "Idle":
         return devices.filter(d => d.Online && (d.Speed ?? 0) === 0);
+
       case "Stopped":
         return devices.filter(d => !d.Online);
+
+      case "Unhealthy":
+        return devices.filter(d => d.Unhealthy === true);
+
+      case "POI":
+        return devices.filter(d => Boolean(d.Poi));
+
+      case "Alerts":
+        return devices.filter(d => (d.AlertCount ?? 0) > 0);
+
+      case "Not Working":
+        return devices.filter(d => d.NotWorking === true);
+
       case "Non Active":
-        return devices.filter(d => !d.LastContact);
+        return devices.filter(d => !d.Online || d.NotWorking === true);
+
       default:
         return devices;
     }
   }, [devices, activeTab]);
 
+
   return (
     <div className="w-[420px] border-r bg-gray-50 flex flex-col">
+      <div className="flex items-center justify-between border-b bg-white px-6 py-3 dark:bg-black">
+        <h2 className="text-lg font-semibold">Live Tracking</h2>
+      </div>
       {/* TABS */}
       <div className="flex gap-2 overflow-x-auto p-3 border-b bg-white">
         {TABS.map(tab => (
@@ -55,10 +75,9 @@ export default function VehicleListPanel({
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`rounded-full px-4 py-1.5 text-sm whitespace-nowrap border
-              ${
-                activeTab === tab
-                  ? "bg-green-50 border-green-400 text-green-700"
-                  : "bg-white text-gray-700"
+              ${activeTab === tab
+                ? "bg-green-50 border-green-400 text-green-700"
+                : "bg-white text-gray-700"
               }`}
           >
             {tab}
