@@ -5,12 +5,12 @@ export async function getDevices() {
     const res = await axios.get(
       "http://localhost:5000/api/v1/devices"
     );
-    // const list = Array.isArray(res.data) ? res.data : [];
     const raw = res.data;
     // ✅ SUPPORT BOTH API SHAPES
     const list = Array.isArray(raw) ? raw : Array.isArray(raw?.list) ? raw.list : [];
     return list.map((d: any) => ({
       DeviceID: String(d.deviceid ?? d.vehReg),
+      VehicleID: String(d.vId ?? null),
       VehicleNumber: d.vehReg ?? "NA",
 
       DriverName: d.drivers?.driverName ?? "NA",
