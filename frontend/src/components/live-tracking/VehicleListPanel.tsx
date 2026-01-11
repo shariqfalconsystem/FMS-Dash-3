@@ -150,18 +150,34 @@ export default function VehicleListPanel({
 
   const filteredDevices = useMemo(() => {
     switch (activeTab) {
-      case "Running":
-        return devices.filter((d) => d.Online && (d.Speed ?? 0) > 0);
-      case "Idle":
-        return devices.filter((d) => d.Online && (d.Speed ?? 0) === 0);
-      case "Stopped":
-        return devices.filter((d) => !d.Online);
-      case "Non Active":
-        return devices.filter((d) => !d.LastContact);
-      default:
-        return devices;
-    }
-  }, [devices, activeTab]);
+            case "Running":
+              return devices.filter(d => d.Online && (d.Speed ?? 0) > 0);
+
+            case "Idle":
+              return devices.filter(d => d.Online && (d.Speed ?? 0) === 0);
+
+            case "Stopped":
+              return devices.filter(d => !d.Online);
+
+            case "Unhealthy":
+              return devices.filter(d => d.Unhealthy === true);
+
+            case "POI":
+              return devices.filter(d => Boolean(d.Poi));
+
+            case "Alerts":
+              return devices.filter(d => (d.AlertCount ?? 0) > 0);
+
+            case "Not Working":
+              return devices.filter(d => d.NotWorking === true);
+
+            case "Non Active":
+              return devices.filter(d => !d.Online || d.NotWorking === true);
+
+            default:
+              return devices;
+          }
+    }, [devices, activeTab]);
 
   return (
     <div className="w-[420px] border-r bg-gray-50 flex flex-col">
@@ -197,13 +213,13 @@ export default function VehicleListPanel({
       </div>
 
       {/* LIST */}
-      <div className="flex-1 overflow-y-auto mt-2 space-y-3 p-3">
+      <div className="flex-1 overflow-y-auto space-y-3 p-3">
         {loading ? (
           <p className="text-sm text-gray-500">Loading vehicles…</p>
         ) : (
           filteredDevices.map((d, i) => (
             <VehicleCard
-              key={d.DeviceID ?? i}
+              key={i}
               device={d}
               onSelect={onSelect}
               onShowRoute={onShowRoute} // pass new prop

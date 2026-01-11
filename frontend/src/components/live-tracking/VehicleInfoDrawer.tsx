@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Device } from "../../types/device";
+import {Device} from "../../types/device";
 import {
   X,
   RefreshCcw,

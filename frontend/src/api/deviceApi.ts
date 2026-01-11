@@ -21,6 +21,8 @@ export async function getDevices() {
 
       Latitude: d.gpsDtl?.latLngDtl?.lat ?? null,
       Longitude: d.gpsDtl?.latLngDtl?.lng ?? null,
+      Destination: d.gpsDtl?.veh_destinationShow ?? null,
+      LastMovingTime: d.gpsDtl?.dtc_lastcheck ?? null,
 
       // Speed: d.gpsDtl?.speed ?? 0,
       Speed: Number(d.gpsDtl?.speed ?? 0),
@@ -36,6 +38,8 @@ export async function getDevices() {
       Unhealthy: String(d.gpsDtl?.ismainpoerconnected) === "0",
 
       NotWorking: Number(d.gpsDtl?.inactiveStatus) === 1,
+      Location: d.gpsDtl?.latLngDtl?.addr ?? "Location not available",
+      LastContact: d.gpsDtl?.lastUpdate || d.lastUpdate || null,
     }));
   } catch (error) {
     console.error("❌ getDevices failed:", error);
