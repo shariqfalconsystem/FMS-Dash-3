@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import {
   Truck,
   Activity,
-  AlertTriangle,
   Wrench,
   ShieldAlert,
+  User,
 } from "lucide-react";
 
 import StatCard from "./StatCard";
@@ -109,13 +109,13 @@ export default function StatCardGrid() {
 
       {/* 3. CRITICAL ALERTS */}
       <StatCard
-        title="Critical Alerts"
+        title="Total Drivers"
         value={criticalAlerts}
-        icon={AlertTriangle}
+        icon={User}
         color={{
-          bg: "bg-red-100 dark:bg-red-500/10",
-          icon: "text-red-600",
-          value: "text-red-700 dark:text-red-400",
+          bg: "bg-green-100 dark:bg-red-500/10",
+          icon: "text-white-600",
+          value: "text-black-700 dark:text-red-400",
         }}
         onClick={() => setFilter("ALERTS")}
       />
@@ -135,7 +135,7 @@ export default function StatCardGrid() {
 
       {/* 5. INCIDENTS */}
       <StatCard
-        title="Incidents (30 Days)"
+        title="Active Trips"
         value={incidentsLast30Days}
         icon={ShieldAlert}
         color={{

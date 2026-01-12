@@ -41,7 +41,7 @@ const navItems: NavItem[] = [
   {
     name: "Drivers",
     icon: <CarFront />,
-    path: "/driver"
+    path: "/drivers"
   },
   {
     name: "Trips / Routes",
