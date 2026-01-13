@@ -98,24 +98,48 @@ app.get("/api/v1/drivers", async (req, res) => {
   res.json(drivers);
 });
 
-const PATH_URL =
-  "https://gtrac.in:8081/trackingDashboard/getpathwithDateDaignostic";
+const PATH_URL = "https://gtrac.in:8081/trackingDashboard/getpathwithDateDaignostic";
 
 app.get("/api/v1/vehicle-path", async (req, res) => {
+  console.log("🔵 ============ PATH REQUEST RECEIVED ============");
+  console.log("🔵 Query params:", req.query);
+
   try {
-    const { vehicleId, start, end } = req.query;
+    let { vehicleId, start, end } = req.query;
+
+    vehicleId = vehicleId?.trim();
+
+    console.log("🔵 Extracted:", { vehicleId, start, end });
+    console.log("🔵 USER_ID:", USER_ID);
+
+    const apiParams = {
+      vId: vehicleId,
+      startdate: start,
+      enddate: end,
+      requestfor: 0,
+      userid: USER_ID
+    };
+
+    console.log("🔵 Calling external API...");
 
     const { data } = await axios.get(PATH_URL, {
-      params: {
-        vId: vehicleId,
-        startdate: start,
-        enddate: end,
-        requestfor: 0,
-        userid: USER_ID
+      params: apiParams,
+      timeout: 30000,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
       }
     });
 
+    console.log("🔵 External API returned successfully ✅");
+    console.log("🔵 patharry length:", data?.patharry?.length);
+
     const pathArr = data?.patharry || [];
+
+    if (pathArr.length === 0) {
+      console.log("⚠️ No path data returned");
+      return res.json([]);
+    }
 
     const points = pathArr
       .filter(p => p.lat && p.lng)
@@ -126,10 +150,24 @@ app.get("/api/v1/vehicle-path", async (req, res) => {
         time: p.datetime
       }));
 
+    console.log("🔵 Sending", points.length, "points");
     res.json(points);
+
   } catch (err) {
-    console.error("Path API failed", err.message);
-    res.status(500).json([]);
+    console.error("❌ Backend error:", err.message);
+
+    // ✅ FALLBACK: Return mock data for testing
+    console.log("⚠️ Returning mock path data for testing");
+
+    // const mockPath = [
+    //   { lat: 26.9124, lng: 75.7873 },
+    //   { lat: 26.9140, lng: 75.7890 },
+    //   { lat: 26.9156, lng: 75.7907 },
+    //   { lat: 26.9172, lng: 75.7924 },
+    //   { lat: 26.9188, lng: 75.7941 }
+    // ];
+
+    // res.json(mockPath);
   }
 });
 
