@@ -1,5 +1,6 @@
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Device } from "../../types/device";
+import { handleToggleButton } from "../common/handleToggleButton";
 import {
   X,
   RefreshCcw,
@@ -9,18 +10,29 @@ import {
   Pause,
   MapPin,
 } from "lucide-react";
+import { DashboardSummary, PathPoint } from "../../api/pathApi";
 
 type TabType = "ALL" | "MOVEMENT" | "STOPPAGES" | "DIAGNOSTIC" | "ALERTS";
 
 interface Props {
   device: Device;
+  dashboard: DashboardSummary;
   onClose: () => void;
 }
 
-export default function VehicleInfoDrawer({ device, onClose }: Props) {
+
+export default function VehicleInfoDrawer({ device, onClose, dashboard }: Props) {
   const [activeTab, setActiveTab] = useState<TabType>("ALL");
   const [dateFilter, setDateFilter] = useState("Today");
   const [isExpanded, setIsExpanded] = useState(false);
+  const { closeSidebar, isSidebarOpen } = handleToggleButton();
+
+const handleButton = () => {
+  onClose(),
+  closeSidebar()
+  isSidebarOpen
+}
+
 
   /* ---------------- DERIVED DATA (NO UI CHANGE) ---------------- */
 
@@ -28,14 +40,10 @@ export default function VehicleInfoDrawer({ device, onClose }: Props) {
   const isStopped = !device.Online;
   const isIdle = device.Online && (device.Speed ?? 0) === 0;
 
-  const updatedAt = device.LastContact
-    ? new Date(device.LastContact).toLocaleString()
+  const updatedAt = dashboard.toTime
+    ? new Date(dashboard.toTime).toLocaleString()
     : "N/A";
 
-  const totalDistance = useMemo(() => {
-    // temporary logic until trip API
-    return `${Math.round((device.Speed ?? 0) * 5)} KM`;
-  }, [device.Speed]);
 
   /* ---------------- HANDLERS ---------------- */
 
@@ -51,7 +59,7 @@ export default function VehicleInfoDrawer({ device, onClose }: Props) {
     console.log("Timeline clicked:", event);
   };
 
-  /* ---------------- RENDER ---------------- */
+
 
   return (
     <div
@@ -79,7 +87,7 @@ export default function VehicleInfoDrawer({ device, onClose }: Props) {
           />
           <X
             className="h-5 w-5 cursor-pointer"
-            onClick={onClose}
+            onClick={handleButton}
           />
         </div>
       </div>
@@ -106,15 +114,16 @@ export default function VehicleInfoDrawer({ device, onClose }: Props) {
       <div className="grid grid-cols-3 divide-x border-b text-center">
         <SummaryItem
           label="Running Time"
-          value={isRunning ? "Running" : "—"}
+          value={dashboard.runningTime || "—"}
         />
+
         <SummaryItem
           label="Total Distance"
-          value={totalDistance}
+          value={dashboard.totalDistance}
         />
         <SummaryItem
           label="Stopped Time"
-          value={isStopped ? "Stopped" : "—"}
+          value={dashboard.stoppageTime || "—"}
         />
       </div>
 
@@ -155,7 +164,7 @@ export default function VehicleInfoDrawer({ device, onClose }: Props) {
           <TimelineCard
             icon={<Play className="h-4 w-4 text-green-600 shrink-0" />}
             title="Vehicle Running"
-            distance={totalDistance}
+            distance={dashboard.totalDistance}
             location={device.Address || "—"}
             time={updatedAt}
             onClick={() => handleTimelineClick("RUN")}
@@ -210,8 +219,8 @@ function Tab({
     <button
       onClick={onClick}
       className={`pb-2 ${active
-          ? "border-b-2 border-teal-500 font-medium text-teal-600"
-          : "text-gray-500 hover:text-gray-800"
+        ? "border-b-2 border-teal-500 font-medium text-teal-600"
+        : "text-gray-500 hover:text-gray-800"
         }`}
     >
       {label}

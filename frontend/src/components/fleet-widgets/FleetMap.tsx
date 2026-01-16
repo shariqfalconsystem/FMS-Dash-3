@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import CountryMap from "../map/CountryMap";
+// import CountryMap from "../map/CountryMap";
 import { Device } from "../../types/device";
 
 interface FleetMapProps {
@@ -94,7 +94,7 @@ export default function FleetMap({ devices = [] }: FleetMapProps) {
       {/* Map */}
       <div className="mt-6 overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800">
         <div className="h-[219px] w-full">
-          <CountryMap devices={devices} />
+          {/* <CountryMap devices={devices} /> */}
         </div>
       </div>
     </div>

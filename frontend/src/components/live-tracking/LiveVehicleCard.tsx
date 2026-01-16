@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { DriverPopup } from "./DriverPopup";
 import { Device } from "../../types/device";
+import { handleToggleButton } from "../common/handleToggleButton";
 import {
   Satellite,
   Fuel,
@@ -15,20 +16,32 @@ import {
 function VehicleCard({
   device,
   onSelect,
+  onShowRoute,
 }: {
   device: Device;
   onSelect: (d: Device) => void;
+  onShowRoute: (d: Device) => void; // NEW
 }) {
   const [showDriverPopup, setShowDriverPopup] = useState(false);
+  const { closeSidebar, isSidebarOpen } = handleToggleButton();
 
   const isOnline = device.Online;
   const isRunning = isOnline && (device.Speed ?? 0) > 0;
   const isUnhealthy = device.MainPowerConnected === false;
 
+  // preserve existing behavior: when user clicks card we open drawer (onSelect)
+  // additionally we trigger route drawing (onShowRoute)
+  const handleCardClick = () => {
+    isSidebarOpen
+    closeSidebar();
+    onSelect(device);    // opens VehicleInfoDrawer (unchanged)
+    onShowRoute(device); // NEW: ask parent to draw route for this vehicle
+  };
+
   return (
     <>
       <div
-        onClick={() => onSelect(device)}
+        onClick={handleCardClick}
         className="relative rounded-xl border bg-white p-4 cursor-pointer hover:shadow-sm"
       >
         {/* UNHEALTHY BADGE */}
@@ -57,16 +70,13 @@ function VehicleCard({
 
             <p className="text-xs text-teal-600 mt-0.5">
               Last data received at{" "}
-              {device.LastContact
-                ? new Date(device.LastContact).toLocaleString()
-                : "N/A"}
+              {device.LastContact ? new Date(device.LastContact).toLocaleString() : "N/A"}
             </p>
           </div>
 
           {/* ONLINE DOT */}
           <span
-            className={`h-3 w-3 rounded-full ${isOnline ? "bg-green-500" : "bg-red-500"
-              }`}
+            className={`h-3 w-3 rounded-full ${isOnline ? "bg-green-500" : "bg-red-500"}`}
           />
         </div>
 
@@ -82,11 +92,10 @@ function VehicleCard({
         <div className="mt-1 flex items-center gap-1 text-sm text-gray-700">
           <Lock size={14} className="shrink-0" />
           <span className="truncate">
-            {device.ELockLocation ||
-              device.Address ||
-              "E-lock location not available"}
+            {device.ELockLocation || device.Address || "E-lock location not available"}
           </span>
         </div>
+
         {/* GEOFENCE */}
         <div className="mt-1 flex items-center gap-1 text-xs text-gray-600">
           <Target size={12} />
@@ -107,7 +116,7 @@ function VehicleCard({
 
           {/* EDIT ICON */}
           <button
-            onClick={e => {
+            onClick={(e) => {
               e.stopPropagation();
               setShowDriverPopup(true);
             }}
@@ -117,7 +126,6 @@ function VehicleCard({
             <Pencil size={14} />
           </button>
         </div>
-
 
         {/* METRICS */}
         <div className="mt-3 grid grid-cols-3 gap-2 text-center text-sm">
@@ -130,19 +138,14 @@ function VehicleCard({
             }
           />
           <Metric label="Speed" value={`${device.Speed ?? 0} km/h`} />
-          {/* <Metric label="Speed" value={`${Number(device.Speed).toFixed(1)} km/h`}/> */}
-
           <Metric label="Ignition" value={isOnline ? "On" : "Off"} />
-
         </div>
 
         {/* STATUS */}
         <div className="mt-3 text-xs font-medium">
           Status:{" "}
           {isOnline ? (
-            <span className="text-green-600">
-              Online • {isRunning ? "Running" : "Idle"}
-            </span>
+            <span className="text-green-600">Online • {isRunning ? "Running" : "Idle"}</span>
           ) : (
             <span className="text-red-600">Offline</span>
           )}

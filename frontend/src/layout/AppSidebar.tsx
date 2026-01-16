@@ -58,7 +58,7 @@ const navItems: NavItem[] = [
     path: "/alerts" 
   },
   {
-    name: "Documents Center",
+    name: "Help & Supports",
     icon: <FileText />,
     path: "/document-center",
   },
