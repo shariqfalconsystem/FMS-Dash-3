@@ -1,14 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import NotificationDropdown from "../components/header/NotificationDropdown";
 import UserDropdown from "../components/header/UserDropdown";
-import { handleToggleButton } from "../components/common/handleToggleButton";
-import { useSidebar } from "../context/SidebarContext";
 
 const AppHeader: React.FC = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
   const [notificationCount] = useState(3);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const {toggle} = handleToggleButton();
+  // const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  // const {toggle} = handleToggleButton();
 
   // const { toggleSidebar, toggleMobileSidebar } = useSidebar();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -43,7 +41,7 @@ const AppHeader: React.FC = () => {
       <div className="max-w-[1440px] mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16">
 
         {/* 🔹 Sidebar Collapse Arrow */}
-        <button
+        {/* <button
           onClick={toggle}
           aria-label="Toggle Sidebar"
           className="flex items-center justify-center w-10 h-10 rounded-lg
@@ -66,7 +64,7 @@ const AppHeader: React.FC = () => {
               d="M9 5l7 7-7 7"
             />
           </svg>
-        </button>
+        </button> */}
 
         {/* Center / Logo / Search */}
         <div className="flex-1 flex items-center justify-center lg:justify-start gap-4" />

@@ -25,12 +25,9 @@ export default function VehicleInfoDrawer({ device, onClose, dashboard }: Props)
   const [activeTab, setActiveTab] = useState<TabType>("ALL");
   const [dateFilter, setDateFilter] = useState("Today");
   const [isExpanded, setIsExpanded] = useState(false);
-  const { closeSidebar, isSidebarOpen } = handleToggleButton();
 
 const handleButton = () => {
-  onClose(),
-  closeSidebar()
-  isSidebarOpen
+  onClose()
 }
 
 

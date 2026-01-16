@@ -95,7 +95,7 @@ export default function LiveFleetMap({
   const endPoint = pathArray[pathArray.length - 1];
 
   return (
-    <div className="fixed inset-0 left-184">
+    <div className="fixed inset-0 left-134">
       <GoogleMap
       center={INDIA_CENTER}
         zoom={5}
