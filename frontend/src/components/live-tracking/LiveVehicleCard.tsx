@@ -23,7 +23,6 @@ function VehicleCard({
   onShowRoute: (d: Device) => void; // NEW
 }) {
   const [showDriverPopup, setShowDriverPopup] = useState(false);
-  const { closeSidebar, isSidebarOpen } = handleToggleButton();
 
   const isOnline = device.Online;
   const isRunning = isOnline && (device.Speed ?? 0) > 0;
@@ -32,8 +31,6 @@ function VehicleCard({
   // preserve existing behavior: when user clicks card we open drawer (onSelect)
   // additionally we trigger route drawing (onShowRoute)
   const handleCardClick = () => {
-    isSidebarOpen
-    closeSidebar();
     onSelect(device);    // opens VehicleInfoDrawer (unchanged)
     onShowRoute(device); // NEW: ask parent to draw route for this vehicle
   };

@@ -33,7 +33,7 @@ const AppHeader: React.FC = () => {
       <div className="max-w-[1440px] mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16">
 
         {/* 🔹 Sidebar Collapse Arrow */}
-        <button
+        {/* <button
           onClick={toggle}
           aria-label="Toggle Sidebar"
           className="flex items-center justify-center w-10 h-10 rounded-lg
@@ -56,7 +56,7 @@ const AppHeader: React.FC = () => {
               d="M9 5l7 7-7 7"
             />
           </svg>
-        </button>
+        </button> */}
 
         {/* Center / Logo / Search */}
         <div className="flex-1 flex items-center justify-center lg:justify-start gap-4" />

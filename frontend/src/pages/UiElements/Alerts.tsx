@@ -34,21 +34,21 @@ const initialAlerts: FleetAlert[] = [
 // Icons for types
 const typeIcons = { Vehicle: FaCar, Fuel: FaGasPump, Driver: FaUser, Geofence: FaMapMarkerAlt, System: FaCheckCircle };
 
-// Pastel/light colors for types
+// Professional colors for types (modern palette)
 const typeColors = {
-  Vehicle: "bg-pink-50 text-pink-700",
-  Fuel: "bg-yellow-50 text-yellow-800",
-  Driver: "bg-purple-50 text-purple-800",
-  Geofence: "bg-teal-50 text-teal-800",
-  System: "bg-green-50 text-green-800",
+  Vehicle: "border-blue-500 bg-blue-50",
+  Fuel: "border-amber-500 bg-amber-50",
+  Driver: "border-purple-500 bg-purple-50",
+  Geofence: "border-teal-500 bg-teal-50",
+  System: "border-green-500 bg-green-50",
 };
 
-// Pastel/light colors for severity badges
+// Severity colors (modern, readable)
 const severityColors = {
-  Critical: "bg-red-50 border-red-200 text-red-700",
-  Warning: "bg-orange-50 border-orange-200 text-orange-700",
-  Info: "bg-blue-50 border-blue-200 text-blue-700",
-  Normal: "bg-green-50 border-green-200 text-green-700",
+  Critical: "bg-red-50 border-red-500 text-red-700",
+  Warning: "bg-orange-50 border-orange-500 text-orange-700",
+  Info: "bg-blue-50 border-blue-500 text-blue-700",
+  Normal: "bg-green-50 border-green-500 text-green-700",
 };
 
 // Severity icons
@@ -58,6 +58,10 @@ const severityIcons = {
   Info: <FaInfoCircle className="inline mr-1" />,
   Normal: <FaCheck className="inline mr-1" />,
 };
+
+// Types and Severities for filters
+const alertTypes: FleetAlert["type"][] = ["Vehicle", "Fuel", "Driver", "Geofence", "System"];
+const alertSeverities: FleetAlert["severity"][] = ["Critical", "Warning", "Info", "Normal"];
 
 export default function FleetManagerAlerts() {
   const [alerts, setAlerts] = useState<FleetAlert[]>(initialAlerts);
@@ -78,19 +82,46 @@ export default function FleetManagerAlerts() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-100 p-6">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">Fleet Alerts Dashboard</h1>
 
-      {/* Search */}
+      {/* Filter & Search Bar */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-        <div className="flex items-center w-full md:w-1/3 bg-white rounded-lg border border-gray-200 px-3 py-2 text-sm focus-within:ring-2 focus-within:ring-gray-300 transition">
+        <div className="flex flex-wrap gap-2">
+          {/* Type Filter */}
+          <select
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value as any)}
+            className="px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-800 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-400"
+          >
+            <option value="All">All Types</option>
+            {alertTypes.map((type) => (
+              <option key={type} value={type}>{type}</option>
+            ))}
+          </select>
+
+          {/* Severity Filter */}
+          <select
+            value={filterSeverity}
+            onChange={(e) => setFilterSeverity(e.target.value as any)}
+            className="px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-800 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-400"
+          >
+            <option value="All">All Severities</option>
+            {alertSeverities.map((sev) => (
+              <option key={sev} value={sev}>{sev}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Search Box */}
+        <div className="flex items-center w-full md:w-1/3 bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus-within:ring-1 focus-within:ring-indigo-400 transition">
           <FaSearch className="text-gray-400" />
           <input
             type="text"
             placeholder="Search alerts..."
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
-            className="flex-1 border-none focus:outline-none focus:ring-0 bg-transparent text-gray-700"
+            className="flex-1 ml-2 border-none focus:outline-none bg-transparent text-gray-800"
           />
         </div>
       </div>
@@ -103,12 +134,12 @@ export default function FleetManagerAlerts() {
             return (
               <div
                 key={alert.id}
-                className={`bg-white rounded-xl p-5 border-l-4 ${typeColors[alert.type]} transition hover:shadow-md`}
+                className={`bg-white rounded-lg border-l-4 p-5 shadow-sm hover:shadow-lg transition ${typeColors[alert.type]}`}
               >
-                <div className="flex justify-between items-start mb-2">
+                <div className="flex justify-between items-start mb-3">
                   <div className="flex items-center gap-2">
-                    <TypeIcon className="text-xl" />
-                    <h2 className="font-semibold text-gray-800">{alert.type}</h2>
+                    <TypeIcon className="text-xl text-gray-700" />
+                    <span className="font-semibold text-gray-900">{alert.type}</span>
                   </div>
                   <span
                     className={`flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full border ${severityColors[alert.severity]}`}
@@ -117,22 +148,25 @@ export default function FleetManagerAlerts() {
                     {alert.severity}
                   </span>
                 </div>
+
                 <h3 className="text-lg font-semibold text-gray-900">{alert.title}</h3>
                 <p className="text-gray-700 mt-1">{alert.message}</p>
+
                 <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
                   <span>{alert.timestamp}</span>
                   <span
                     className={`px-2 py-1 rounded-full font-semibold ${
-                      alert.resolved ? "bg-gray-100 text-gray-700" : "bg-red-50 text-red-700"
+                      alert.resolved ? "bg-gray-200 text-gray-800" : "bg-red-50 text-red-700"
                     }`}
                   >
                     {alert.resolved ? "Resolved" : "Active"}
                   </span>
                 </div>
+
                 {!alert.resolved && (
                   <button
                     onClick={() => markResolved(alert.id)}
-                    className="mt-3 w-full bg-gray-100 text-gray-800 rounded-lg px-3 py-2 text-sm font-medium hover:bg-gray-200 transition"
+                    className="mt-3 w-full bg-indigo-50 text-indigo-700 rounded-lg px-3 py-2 text-sm font-medium hover:bg-indigo-100 transition"
                   >
                     Mark Resolved
                   </button>
