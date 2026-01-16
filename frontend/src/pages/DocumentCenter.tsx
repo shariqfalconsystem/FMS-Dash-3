@@ -85,8 +85,9 @@ export default function DocumentationCenter() {
     content: "",
   });
 
-  const toggleDoc = (id: number) =>
-    setOpenDoc(openDoc === id ? null : id);
+  const [copySuccess, setCopySuccess] = useState<string>("");
+
+  const toggleDoc = (id: number) => setOpenDoc(openDoc === id ? null : id);
 
   const filteredDocs = docs.filter((doc) => {
     const matchesSearch =
@@ -99,127 +100,163 @@ export default function DocumentationCenter() {
 
   const downloadPDF = (doc: DocItem) => {
     const pdf = new jsPDF();
-    pdf.setFontSize(16);
-    pdf.text(doc.title, 14, 20);
-    pdf.setFontSize(11);
-    pdf.text(pdf.splitTextToSize(doc.content, 180), 14, 30);
+    pdf.setFontSize(18);
+    pdf.text(doc.title, 14, 22);
+    pdf.setFontSize(12);
+    pdf.text(pdf.splitTextToSize(doc.content, 180), 14, 32);
     pdf.save(`${doc.title}.pdf`);
   };
 
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopySuccess("Copied!");
+      setTimeout(() => setCopySuccess(""), 1500); // Reset message
+    } catch (err) {
+      console.error("Failed to copy text: ", err);
+      setCopySuccess("Failed to copy");
+      setTimeout(() => setCopySuccess(""), 1500);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-10">
-      <div className="mx-auto max-w-6xl space-y-8">
+    <div className="min-h-screen bg-gray-50 px-4 py-12">
+      <div className="max-w-6xl mx-auto space-y-10">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <div className="flex items-center gap-3">
-            <FaBook className="text-slate-700" />
-            <h1 className="text-3xl font-semibold text-slate-900">
-              Documentation Center
-            </h1>
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-300 text-gray-700">
+              <FaBook />
+            </div>
+            <div>
+              <h1 className="text-3xl font-semibold text-gray-900">
+                Documentation Center
+              </h1>
+              <p className="text-gray-600 text-sm">
+                Guides, FAQs and help resources
+              </p>
+            </div>
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-2 rounded-md bg-slate-900 px-4 py-2 text-sm text-white"
+            className="flex items-center gap-2 bg-gray-200 text-gray-800 px-5 py-2.5 rounded-lg hover:bg-gray-300 transition"
           >
             <FaPlus /> Add Document
           </button>
         </div>
 
-        {/* Search */}
-        <div className="relative max-w-xl">
-          <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search documentation"
-            className="w-full rounded-md border border-slate-300 py-2 pl-10 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-slate-400"
-          />
-        </div>
-
-        {/* Filters */}
-        <div className="flex flex-wrap gap-2">
-          {["All", "Account", "Usage", "FAQs", "Other"].map((cat) => (
-            <button
-              key={cat}
-              onClick={() =>
-                setSelectedCategory(cat as typeof selectedCategory)
-              }
-              className={`rounded-md border px-4 py-1.5 text-sm ${
-                selectedCategory === cat
-                  ? "bg-slate-900 text-white"
-                  : "bg-white text-slate-700"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+        {/* Search + Category Filters */}
+        <div className="bg-white rounded-xl p-5 border border-gray-200 space-y-4">
+          <div className="relative max-w-xl">
+            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search documentation..."
+              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+            />
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {["All", "Account", "Usage", "FAQs", "Other"].map((cat) => (
+              <button
+                key={cat}
+                onClick={() =>
+                  setSelectedCategory(cat as typeof selectedCategory)
+                }
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${
+                  selectedCategory === cat
+                    ? "bg-gray-300 text-gray-900"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Accordion */}
-        <div className="grid gap-4">
-          {filteredDocs.map((doc) => (
-            <AccordionItem
-              key={doc.id}
-              doc={doc}
-              isOpen={openDoc === doc.id}
-              toggle={() => toggleDoc(doc.id)}
-              downloadPDF={downloadPDF}
-            />
-          ))}
+        <div className="space-y-3">
+          {filteredDocs.length > 0 ? (
+            filteredDocs.map((doc) => (
+              <AccordionItem
+                key={doc.id}
+                doc={doc}
+                isOpen={openDoc === doc.id}
+                toggle={() => toggleDoc(doc.id)}
+                downloadPDF={downloadPDF}
+                copyToClipboard={copyToClipboard}
+              />
+            ))
+          ) : (
+            <p className="text-center text-gray-500">No documents found.</p>
+          )}
         </div>
+
+        {/* Copy feedback */}
+        {copySuccess && (
+          <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg">
+            {copySuccess}
+          </div>
+        )}
       </div>
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-md rounded-lg bg-white p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">New Document</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-md bg-white rounded-xl p-6 border border-gray-200">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold text-gray-900">
+                New Document
+              </h2>
               <button onClick={() => setIsModalOpen(false)}>
-                <FaTimes />
+                <FaTimes className="text-gray-500" />
               </button>
             </div>
-            <input
-              placeholder="Title"
-              className="w-full rounded-md border px-3 py-2 text-sm"
-              value={newDoc.title}
-              onChange={(e) =>
-                setNewDoc({ ...newDoc, title: e.target.value })
-              }
-            />
-            <select
-              className="w-full rounded-md border px-3 py-2 text-sm"
-              value={newDoc.category}
-              onChange={(e) =>
-                setNewDoc({
-                  ...newDoc,
-                  category: e.target.value as DocItem["category"],
-                })
-              }
-            >
-              <option>Account</option>
-              <option>Usage</option>
-              <option>FAQs</option>
-              <option>Other</option>
-            </select>
-            <textarea
-              placeholder="Content"
-              rows={5}
-              className="w-full rounded-md border px-3 py-2 text-sm"
-              value={newDoc.content}
-              onChange={(e) =>
-                setNewDoc({ ...newDoc, content: e.target.value })
-              }
-            />
-            <button
-              onClick={() => {
-                setDocs([...docs, { id: Date.now(), ...newDoc }]);
-                setIsModalOpen(false);
-              }}
-              className="w-full rounded-md bg-slate-900 py-2 text-sm text-white"
-            >
-              Save Document
-            </button>
+            <div className="space-y-4">
+              <input
+                placeholder="Title"
+                className="w-full border border-gray-200 px-3 py-2 rounded-lg text-sm"
+                value={newDoc.title}
+                onChange={(e) =>
+                  setNewDoc({ ...newDoc, title: e.target.value })
+                }
+              />
+              <select
+                className="w-full border border-gray-200 px-3 py-2 rounded-lg text-sm"
+                value={newDoc.category}
+                onChange={(e) =>
+                  setNewDoc({
+                    ...newDoc,
+                    category: e.target.value as DocItem["category"],
+                  })
+                }
+              >
+                <option>Account</option>
+                <option>Usage</option>
+                <option>FAQs</option>
+                <option>Other</option>
+              </select>
+              <textarea
+                rows={5}
+                placeholder="Content"
+                className="w-full border border-gray-200 px-3 py-2 rounded-lg text-sm"
+                value={newDoc.content}
+                onChange={(e) =>
+                  setNewDoc({ ...newDoc, content: e.target.value })
+                }
+              />
+              <button
+                onClick={() => {
+                  setDocs([...docs, { id: Date.now(), ...newDoc }]);
+                  setIsModalOpen(false);
+                  setNewDoc({ title: "", category: "Account", content: "" });
+                }}
+                className="w-full bg-gray-200 text-gray-800 py-2.5 rounded-lg text-sm hover:bg-gray-300 transition"
+              >
+                Save Document
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -232,9 +269,16 @@ interface AccordionProps {
   isOpen: boolean;
   toggle: () => void;
   downloadPDF: (doc: DocItem) => void;
+  copyToClipboard: (text: string) => void;
 }
 
-function AccordionItem({ doc, isOpen, toggle, downloadPDF }: AccordionProps) {
+function AccordionItem({
+  doc,
+  isOpen,
+  toggle,
+  downloadPDF,
+  copyToClipboard,
+}: AccordionProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState("0px");
 
@@ -243,12 +287,12 @@ function AccordionItem({ doc, isOpen, toggle, downloadPDF }: AccordionProps) {
   }, [isOpen]);
 
   return (
-    <div className="rounded-lg border bg-white">
+    <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
       <button
         onClick={toggle}
-        className="flex w-full items-center justify-between px-5 py-4 text-left text-sm font-medium text-slate-800"
+        className="w-full flex justify-between items-center px-6 py-4 text-left text-sm font-semibold text-gray-800"
       >
-        {doc.title}
+        <span>{doc.title}</span>
         <FaChevronDown
           className={`transition-transform ${isOpen ? "rotate-180" : ""}`}
         />
@@ -256,20 +300,20 @@ function AccordionItem({ doc, isOpen, toggle, downloadPDF }: AccordionProps) {
       <div
         ref={ref}
         style={{ height }}
-        className="overflow-hidden transition-all duration-300"
+        className="overflow-hidden transition-all duration-300 px-6"
       >
-        <div className="space-y-4 px-5 py-4 text-sm text-slate-700">
+        <div className="py-4 space-y-3 text-gray-700 text-sm">
           <p className="whitespace-pre-line">{doc.content}</p>
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <button
               onClick={() => downloadPDF(doc)}
-              className="flex items-center gap-2 rounded-md bg-slate-800 px-3 py-1.5 text-xs text-white"
+              className="flex items-center gap-2 px-4 py-1.5 text-xs bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition"
             >
               <FaFilePdf /> PDF
             </button>
             <button
-              onClick={() => navigator.clipboard.writeText(doc.content)}
-              className="flex items-center gap-2 rounded-md border px-3 py-1.5 text-xs"
+              onClick={() => copyToClipboard(doc.content)}
+              className="flex items-center gap-2 px-4 py-1.5 text-xs border border-gray-200 rounded-lg hover:bg-gray-100 transition"
             >
               <FaCopy /> Copy
             </button>

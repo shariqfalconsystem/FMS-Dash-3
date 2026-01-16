@@ -274,7 +274,7 @@ const ReportCard: React.FC<{ title: string; children: React.ReactNode }> = ({
 }) => (
   <div className="bg-white rounded-2xl shadow-md p-5 hover:shadow-lg transition">
     <h2 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-      <BarChart2 className="w-4 h-4 text-gray-400" /> {title}
+      <BarChart2 className="w-10 h-4 text-gray-400" /> {title}
     </h2>
     {children}
   </div>

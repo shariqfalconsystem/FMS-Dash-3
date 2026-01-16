@@ -2,26 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import NotificationDropdown from "../components/header/NotificationDropdown";
 import UserDropdown from "../components/header/UserDropdown";
 import { handleToggleButton } from "../components/common/handleToggleButton";
-import { useSidebar } from "../context/SidebarContext";
 
 const AppHeader: React.FC = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
   const [notificationCount] = useState(3);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen] = useState(true);
   const {toggle} = handleToggleButton();
 
   // const { toggleSidebar, toggleMobileSidebar } = useSidebar();
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Handle sidebar toggle
-  // const handleToggle = () => {
-  //   if (window.innerWidth >= 1024) {
-  //     toggleSidebar();
-  //   } else {
-  //     toggleMobileSidebar();
-  //   }
-  //   setIsSidebarOpen((prev) => !prev);
-  // };
 
   const toggleApplicationMenu = () =>
     setApplicationMenuOpen((prev) => !prev);
