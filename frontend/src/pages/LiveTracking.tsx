@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Device } from "../types/device";
 import { getDevices } from "../api/deviceApi";
-import { getPath } from "../api/diagnosticApi";
+import { DashboardSummary, getPath } from "../api/pathApi";
 import LiveFleetMap from "../components/live-tracking/LiveFleetMap";
 import VehicleInfoDrawer from "../components/live-tracking/VehicleInfoDrawer";
 import VehicleListPanel from "../components/live-tracking/VehicleListPanel";
@@ -13,6 +13,8 @@ export default function LiveTracking() {
   const [routeDevice, setRouteDevice] = useState<Device | null>(null);
   const [loading, setLoading] = useState(true);
   const [mapPopupDevice, setMapPopupDevice] = useState<Device | null>(null);
+  const [dashboard, setDashboard] = useState<DashboardSummary | null>(null);
+
 
   const handleMarkerClick = (d: Device) => {
     setMapPopupDevice(d);
@@ -30,27 +32,26 @@ export default function LiveTracking() {
         return;
       }
 
-      console.log("🚀 Fetching path for:", routeDevice.VehicleNumber, routeDevice.DeviceID);
-
       try {
         const now = new Date();
-        const last24hours = new Date(now.getTime() - 24 * 60 * 60 * 1000); // ✅ Changed to 24 hours
+        const last24hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-        console.log("📅 Time range:", {
-          start: last24hours.toISOString(),
-          end: now.toISOString()
-        });
-
-        const data = await getPath(
-          routeDevice.DeviceID,
-          last24hours.toISOString(), // ✅ 24 hours ago
+        const result = await getPath(
+          Number(routeDevice.VehicleID),
+          last24hours.toISOString(),
           now.toISOString()
         );
 
-        console.log("✅ Path data received:", data);
-        console.log("📍 Number of points:", data.length);
+        if (!result) {
+          setPathArray([]);
+          return;
+        }
 
-        setPathArray(data);
+        // ✅ Only send the path array to the map
+        setPathArray(result.path);
+
+        // later you can do:
+        setDashboard(result.summary);
 
       } catch (err) {
         console.error("❌ Path fetch failed:", err);
@@ -72,7 +73,6 @@ export default function LiveTracking() {
     const fetchDevices = async () => {
       try {
         const data = await getDevices();
-        console.log("📡 Devices loaded:", data.length);
         setDevices(data);
       } catch (err) {
         console.error("❌ Device fetch failed:", err);
@@ -96,18 +96,19 @@ export default function LiveTracking() {
             devices={devices}
             loading={loading}
             onSelect={(d) => {
-              console.log("🎯 Card clicked - opening drawer:", d.VehicleNumber);
+              // console.log("🎯 Card clicked - opening drawer:", d.VehicleNumber);
               setSelectedDevice(d);
             }}
             onShowRoute={(d) => {
-              console.log("🗺️ Show route clicked:", d.VehicleNumber, d.DeviceID);
+              // console.log("🗺️ Show route clicked:", d.VehicleNumber, d.DeviceID);
               setRouteDevice(d);
             }}
           />
 
-          {selectedDevice && (
+          {selectedDevice && dashboard &&(
             <VehicleInfoDrawer
               device={selectedDevice}
+              dashboard={dashboard}
               onClose={() => setSelectedDevice(null)}
             />
           )}

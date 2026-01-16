@@ -29,5 +29,6 @@ export interface Device {
   LastMovingTime?: string;
   IdleTime?: string; 
 
-  LastContact?: string;       // ✅ added (ISO string)
+  LastContact?: string;  
+  LastUpdate?: string;
 }

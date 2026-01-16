@@ -40,6 +40,7 @@ export async function getDevices() {
       NotWorking: Number(d.gpsDtl?.inactiveStatus) === 1,
       Location: d.gpsDtl?.latLngDtl?.addr ?? "Location not available",
       LastContact: d.gpsDtl?.lastUpdate || d.lastUpdate || null,
+      LastUpdate: d.gpsDtl?.latLngDtl?.gpstime,
     }));
   } catch (error) {
     console.error("❌ getDevices failed:", error);

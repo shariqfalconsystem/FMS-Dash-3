@@ -101,44 +101,89 @@ app.get("/api/v1/drivers", async (req, res) => {
 const PATH_URL = "https://gtrac.in:8081/trackingDashboard/getpathwithDateDaignostic";
 
 app.get("/api/v1/vehicle-path", async (req, res) => {
-  console.log("🔵 ============ PATH REQUEST RECEIVED ============");
-  console.log("🔵 Query params:", req.query);
-
   try {
     let { vehicleId, start, end } = req.query;
 
-    vehicleId = vehicleId?.trim();
-
-    console.log("🔵 Extracted:", { vehicleId, start, end });
-    console.log("🔵 USER_ID:", USER_ID);
+    const startDateTime = `${start} 00:00:00`;
+    const endDateTime = `${end} 23:59:59`;
 
     const apiParams = {
       vId: vehicleId,
-      startdate: start,
-      enddate: end,
+      startdate: startDateTime,
+      enddate: endDateTime,
       requestfor: 0,
       userid: USER_ID
     };
 
-    console.log("🔵 Calling external API...");
-
-    const { data } = await axios.get(PATH_URL, {
+    const response = await axios.get(PATH_URL, {
       params: apiParams,
-      timeout: 30000,
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
+      timeout: 30000
     });
 
-    console.log("🔵 External API returned successfully ✅");
-    console.log("🔵 patharry length:", data?.patharry?.length);
+    const apiData = response.data;
 
-    const pathArr = data?.patharry || [];
+    const pathArr = apiData?.patharry || [];
 
-    if (pathArr.length === 0) {
-      console.log("⚠️ No path data returned");
-      return res.json([]);
+    const path = Array.isArray(pathArr)
+      ? pathArr
+        .filter(p => p.lat && p.lng)
+        .map(p => ({
+          lat: Number(p.lat),
+          lng: Number(p.lng),
+          speed: Number(p.speed || 0),
+          time: p.datetime || null
+        }))
+      : [];
+
+    // 👇 THIS is what frontend needs
+    res.json({
+      summary: {
+        vehicleId: apiData.vehicleId,
+        fromTime: apiData.fromTime,
+        toTime: apiData.toTime,
+        totalDistance: apiData.totalDistance,
+        totalRunningDistanceKM: apiData.totalRunningDistanceKM,
+        runningTime: apiData.runningTime,
+        stoppageTime: apiData.stoppageTime,
+        avgSpeedKMH: apiData.avgSpeedKMH,
+        maxspeed: apiData.maxspeed,
+        totalStoppage: apiData.totalStoppage,
+        totalNogps: apiData.totalNogps
+      },
+      path,
+      fuel: apiData.fuelarray || []
+    });
+
+  } catch (err) {
+    console.error("❌ Backend error:", err.message);
+    res.status(500).json({ error: "Failed to fetch path" });
+  }
+});
+
+
+app.get("/api/v1/vehicle-path", async (req, res) => {
+  try {
+    let { vehicleId, start, end } = req.query;
+    const startDateTime = `${start} 00:00:00`;
+    const endDateTime = `${end} 23:59:59`;
+
+    const apiParams = {
+      vId: vehicleId,
+      startdate: startDateTime,
+      enddate: endDateTime,
+      requestfor: 0,
+      userid: USER_ID
+    };
+
+    const response = await axios.get(PATH_URL, {
+      params: apiParams,
+      timeout: 30000
+    });
+
+    const pathArr = response.data?.patharry || [];
+
+    if (!Array.isArray(pathArr)) {
+      return res.status(500).json({ error: "Invalid API response" });
     }
 
     const points = pathArr
@@ -146,33 +191,16 @@ app.get("/api/v1/vehicle-path", async (req, res) => {
       .map(p => ({
         lat: Number(p.lat),
         lng: Number(p.lng),
-        speed: p.speed,
-        time: p.datetime
+        speed: Number(p.speed || 0),
+        time: p.datetime || null
       }));
 
-    console.log("🔵 Sending", points.length, "points");
     res.json(points);
-
   } catch (err) {
     console.error("❌ Backend error:", err.message);
-
-    // ✅ FALLBACK: Return mock data for testing
-    console.log("⚠️ Returning mock path data for testing");
-
-    // const mockPath = [
-    //   { lat: 26.9124, lng: 75.7873 },
-    //   { lat: 26.9140, lng: 75.7890 },
-    //   { lat: 26.9156, lng: 75.7907 },
-    //   { lat: 26.9172, lng: 75.7924 },
-    //   { lat: 26.9188, lng: 75.7941 }
-    // ];
-
-    // res.json(mockPath);
+    res.status(500).json({ error: "Failed to fetch path" });
   }
 });
-
-
-
 
 
 app.listen(PORT, () => {

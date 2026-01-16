@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import {
   GoogleMap,
   Marker,
@@ -17,33 +18,6 @@ interface LiveFleetMapProps {
   closePopup: () => void;
 }
 
-const INDIA_CENTER = { lat: 20.5937, lng: 78.9629 };
-
-function getLastUpdate(lastContact?: string) {
-  if (!lastContact) return "N/A";
-  const diff = Date.now() - new Date(lastContact).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "Just now";
-  if (mins < 60) return `${mins} min ago`;
-  const hrs = Math.floor(mins / 60);
-  return `${hrs} hr ago`;
-}
-
-function getIdleTime(device: Device) {
-  if (!device.LastMovingTime || device.Speed! > 0) return "N/A";
-  const diff = Date.now() - new Date(device.LastMovingTime).getTime();
-  const mins = Math.floor(diff / 60000);
-  return mins > 60 ? `${Math.floor(mins / 60)}h ${mins % 60}m` : `${mins}m`;
-}
-function Row({ label, value, valueClass = "" }: any) {
-  return (
-    <div className="flex justify-between">
-      <span className="text-gray-500">{label}</span>
-      <span className={valueClass}>{value}</span>
-    </div>
-  );
-}
-
 export default function LiveFleetMap({
   devices,
   pathArray,
@@ -51,21 +25,84 @@ export default function LiveFleetMap({
   mapPopupDevice,
   closePopup
 }: LiveFleetMapProps) {
+
+  const INDIA_CENTER = { lat: 20.5937, lng: 78.9629 };
+
+  // ✅ ALL HOOKS AT TOP (NO CONDITIONS)
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const lastRouteRef = useRef<string>("");
+
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_KEY
   });
 
-  if (!isLoaded) return <div>Loading map…</div>;
+  function Row({ label, value, valueClass = "" }: any) {
+    return (
+      <div className="flex justify-between">
+        <span className="text-gray-500">{label}</span>
+        <span className={valueClass}>{value}</span>
+      </div>
+    );
+  }
+  // // vehicles images 
+  function getVehicleIcon(v: Device) {
+    const isOnline = v.Online;
+    const speed = v.Speed ?? 0;
 
-  const startPoint = pathArray.length ? pathArray[0] : null;
-  const endPoint = pathArray.length ? pathArray[pathArray.length - 1] : null;
+    if (!isOnline) {
+      return "/markers/stopped.png";   // 🔴 Offline / stopped
+    }
+
+    if (speed > 2) {
+      return "/markers/running.png";   // 🟢 Moving
+    }
+
+    return "/markers/idle.png";        // ⚫ Idle
+  }
+
+  // ✅ auto-zoom on polyline
+  useEffect(() => {
+    if (!pathArray.length) return;
+
+    const hash = `${pathArray[0].lat},${pathArray[0].lng}-${pathArray[pathArray.length - 1]?.lat}`;
+
+    if (hash === lastRouteRef.current) return;
+    lastRouteRef.current = hash;
+
+    if (!mapRef.current) return;
+    if (!pathArray || pathArray.length === 0) return;
+
+    const bounds = new google.maps.LatLngBounds();
+
+    pathArray.forEach(p => {
+      bounds.extend({ lat: p.lat, lng: p.lng });
+    });
+
+    mapRef.current.fitBounds(bounds, {
+      top: 80,
+      bottom: 80,
+      left: 80,
+      right: 80
+    });
+  }, [pathArray]);
+
+  // ✅ SAFE conditional rendering (NO hooks below)
+  if (!isLoaded) {
+    return <div>Loading map…</div>;
+  }
+
+  const startPoint = pathArray[0];
+  const endPoint = pathArray[pathArray.length - 1];
 
   return (
     <div className="fixed inset-0 left-184">
       <GoogleMap
+      center={INDIA_CENTER}
         zoom={5}
-        center={INDIA_CENTER}
         mapContainerStyle={{ width: "100%", height: "100%" }}
+        onLoad={(map) => {
+          mapRef.current = map;
+        }}
       >
 
         {/* 🚚 ALL VEHICLES FROM devices[] */}
@@ -78,6 +115,11 @@ export default function LiveFleetMap({
                     key={v.DeviceID}
                     position={{ lat: v.Latitude, lng: v.Longitude }}
                     title={v.VehicleNumber}
+                    icon={{
+                      url: getVehicleIcon(v),
+                      scaledSize: new google.maps.Size(56, 56), // adjust size here
+                      anchor: new google.maps.Point(18, 18),   // center the image
+                    }}
                     onClick={() => onMarkerClick(v)}
                     onLoad={m => // @ts-ignore
                       clusterer.addMarker(m)}
@@ -167,12 +209,12 @@ export default function LiveFleetMap({
 
                 <Row
                   label="Last Update"
-                  value={getLastUpdate(mapPopupDevice.LastContact)}
+                  value={mapPopupDevice.LastUpdate || "N/A"}
                 />
 
                 <Row
                   label="Idle Time"
-                  value={getIdleTime(mapPopupDevice)}
+                  value={mapPopupDevice.LastUpdate || "N/A"}
                 />
 
                 <Row
@@ -190,3 +232,4 @@ export default function LiveFleetMap({
     </div>
   );
 }
+
