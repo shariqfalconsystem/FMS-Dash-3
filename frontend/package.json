@@ -24,6 +24,7 @@
     "apexcharts": "^4.1.0",
     "axios": "^1.13.2",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "flatpickr": "^4.6.13",
     "hooks": "^0.3.2",
     "jspdf": "^4.0.0",

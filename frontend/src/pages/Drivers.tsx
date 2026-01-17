@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Truck, UserCheck, UserX, UserLock, Plus, Search } from "lucide-react";
+import DatePicker from "react-datepicker";
 
 /* ------------------- DRIVER INTERFACE ------------------- */
 interface Driver {
@@ -314,123 +315,156 @@ const DriversDashboard: React.FC = () => {
       </div>
 
       {/* Add Driver Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-4xl">
-            <h2 className="text-xl font-bold mb-4">Add New Driver</h2>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-              <select
-                className="px-3 py-2 border rounded-lg"
-                value={newDriver.title || "Mr."}
-                onChange={e => setNewDriver(prev => ({ ...prev, title: e.target.value }))}
-              >
-                <option value="Mr.">Mr.</option>
-                <option value="Ms.">Ms.</option>
-                <option value="Mrs.">Mrs.</option>
-              </select>
-              <input
-                type="text"
-                placeholder="First Name *"
-                className="px-3 py-2 border rounded-lg"
-                value={newDriver.firstName || ""}
-                onChange={e => setNewDriver(prev => ({ ...prev, firstName: e.target.value }))}
-              />
-              <input
-                type="text"
-                placeholder="Last Name *"
-                className="px-3 py-2 border rounded-lg"
-                value={newDriver.lastName || ""}
-                onChange={e => setNewDriver(prev => ({ ...prev, lastName: e.target.value }))}
-              />
-              <input
-                type="text"
-                placeholder="License No. *"
-                className="px-3 py-2 border rounded-lg"
-                value={newDriver.licenseNo || ""}
-                onChange={e => setNewDriver(prev => ({ ...prev, licenseNo: e.target.value }))}
-              />
-              <input
-                type="date"
-                placeholder="License Expiry"
-                className="px-3 py-2 border rounded-lg"
-                value={newDriver.licenseExpiry || ""}
-                onChange={e => setNewDriver(prev => ({ ...prev, licenseExpiry: e.target.value }))}
-              />
-              <input
-                type="text"
-                placeholder="License Type"
-                className="px-3 py-2 border rounded-lg"
-                value={newDriver.licenseType || ""}
-                onChange={e => setNewDriver(prev => ({ ...prev, licenseType: e.target.value }))}
-              />
-              <input
-                type="text"
-                placeholder="License State"
-                className="px-3 py-2 border rounded-lg"
-                value={newDriver.licenseState || ""}
-                onChange={e => setNewDriver(prev => ({ ...prev, licenseState: e.target.value }))}
-              />
-              <input
-                type="tel"
-                placeholder="Primary Phone *"
-                className="px-3 py-2 border rounded-lg"
-                value={newDriver.primaryPhone || ""}
-                onChange={e => setNewDriver(prev => ({ ...prev, primaryPhone: e.target.value }))}
-              />
-              <input
-                type="tel"
-                placeholder="Alt Phone"
-                className="px-3 py-2 border rounded-lg"
-                value={newDriver.altPhone || ""}
-                onChange={e => setNewDriver(prev => ({ ...prev, altPhone: e.target.value }))}
-              />
-              <input
-                type="email"
-                placeholder="Email *"
-                className="px-3 py-2 border rounded-lg"
-                value={newDriver.email || ""}
-                onChange={e => setNewDriver(prev => ({ ...prev, email: e.target.value }))}
-              />
-              <input
-                type="text"
-                placeholder="Address"
-                className="px-3 py-2 border rounded-lg col-span-2"
-                value={newDriver.address || ""}
-                onChange={e => setNewDriver(prev => ({ ...prev, address: e.target.value }))}
-              />
-              <input
-                type="date"
-                placeholder="Employment Start"
-                className="px-3 py-2 border rounded-lg"
-                value={newDriver.employmentStart || ""}
-                onChange={e => setNewDriver(prev => ({ ...prev, employmentStart: e.target.value }))}
-              />
-              <input
-                type="date"
-                placeholder="DOB"
-                className="px-3 py-2 border rounded-lg"
-                value={newDriver.dob || ""}
-                onChange={e => setNewDriver(prev => ({ ...prev, dob: e.target.value }))}
-              />
-            </div>
+{isModalOpen && (
+  <div className="fixed inset-0 bg-opacity-40 flex items-center justify-center z-50">
+    <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-4xl">
+      <h2 className="text-xl font-bold mb-4">Add New Driver</h2>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
 
-            <div className="flex justify-end gap-3 mt-4">
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAddDriver}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+        {/* Title */}
+        <select
+          className="px-3 py-2 border rounded-lg"
+          value={newDriver.title || "Mr."}
+          onChange={e => setNewDriver(prev => ({ ...prev, title: e.target.value }))}
+        >
+          <option value="Mr.">Mr.</option>
+          <option value="Ms.">Ms.</option>
+          <option value="Mrs.">Mrs.</option>
+        </select>
+
+        {/* First & Last Name */}
+        <input
+          type="text"
+          placeholder="First Name *"
+          className="px-3 py-2 border rounded-lg"
+          value={newDriver.firstName || ""}
+          onChange={e => setNewDriver(prev => ({ ...prev, firstName: e.target.value }))}
+        />
+        <input
+          type="text"
+          placeholder="Last Name *"
+          className="px-3 py-2 border rounded-lg"
+          value={newDriver.lastName || ""}
+          onChange={e => setNewDriver(prev => ({ ...prev, lastName: e.target.value }))}
+        />
+
+        {/* License Info */}
+        <input
+          type="text"
+          placeholder="License No. *"
+          className="px-3 py-2 border rounded-lg"
+          value={newDriver.licenseNo || ""}
+          onChange={e => setNewDriver(prev => ({ ...prev, licenseNo: e.target.value }))}
+        />
+
+        {/* License Expiry with DatePicker */}
+        <DatePicker
+          selected={newDriver.licenseExpiry ? new Date(newDriver.licenseExpiry) : null}
+          onChange={(date: Date) => setNewDriver(prev => ({ ...prev, licenseExpiry: date.toISOString().split("T")[0] }))}
+          className="px-3 py-2 border rounded-lg w-full"
+          placeholderText="License Expiry"
+          dateFormat="yyyy-MM-dd"
+        />
+
+        <input
+          type="text"
+          placeholder="License Type"
+          className="px-3 py-2 border rounded-lg"
+          value={newDriver.licenseType || ""}
+          onChange={e => setNewDriver(prev => ({ ...prev, licenseType: e.target.value }))}
+        />
+        <input
+          type="text"
+          placeholder="License State"
+          className="px-3 py-2 border rounded-lg"
+          value={newDriver.licenseState || ""}
+          onChange={e => setNewDriver(prev => ({ ...prev, licenseState: e.target.value }))}
+        />
+
+        {/* Primary Phone */}
+        <input
+          type="text"
+          placeholder="Primary Phone *"
+          maxLength={12}
+          className="px-3 py-2 border rounded-lg"
+          value={newDriver.primaryPhone || ""}
+          onChange={e => {
+            let val = e.target.value.replace(/\D/g, "");
+            if (val.length > 3 && val.length <= 6) val = val.slice(0,3) + '-' + val.slice(3);
+            else if (val.length > 6) val = val.slice(0,3) + '-' + val.slice(3,6) + '-' + val.slice(6,10);
+            setNewDriver(prev => ({ ...prev, primaryPhone: val }));
+          }}
+        />
+
+        {/* Alt Phone */}
+        <input
+          type="text"
+          placeholder="Alt Phone"
+          maxLength={12}
+          className="px-3 py-2 border rounded-lg"
+          value={newDriver.altPhone || ""}
+          onChange={e => {
+            let val = e.target.value.replace(/\D/g, "");
+            if (val.length > 3 && val.length <= 6) val = val.slice(0,3) + '-' + val.slice(3);
+            else if (val.length > 6) val = val.slice(0,3) + '-' + val.slice(3,6) + '-' + val.slice(6,10);
+            setNewDriver(prev => ({ ...prev, altPhone: val }));
+          }}
+        />
+
+        {/* Email & Address */}
+        <input
+          type="email"
+          placeholder="Email *"
+          className="px-3 py-2 border rounded-lg"
+          value={newDriver.email || ""}
+          onChange={e => setNewDriver(prev => ({ ...prev, email: e.target.value }))}
+        />
+        <input
+          type="text"
+          placeholder="Address"
+          className="px-3 py-2 border rounded-lg col-span-2"
+          value={newDriver.address || ""}
+          onChange={e => setNewDriver(prev => ({ ...prev, address: e.target.value }))}
+        />
+
+        {/* Employment Start with DatePicker */}
+        <DatePicker
+          selected={newDriver.employmentStart ? new Date(newDriver.employmentStart) : null}
+          onChange={(date: Date) => setNewDriver(prev => ({ ...prev, employmentStart: date.toISOString().split("T")[0] }))}
+          className="px-3 py-2 border rounded-lg w-full"
+          placeholderText="Employment Start"
+          dateFormat="yyyy-MM-dd"
+        />
+
+        {/* DOB with DatePicker */}
+        <DatePicker
+          selected={newDriver.dob ? new Date(newDriver.dob) : null}
+          onChange={(date: Date) => setNewDriver(prev => ({ ...prev, dob: date.toISOString().split("T")[0] }))}
+          className="px-3 py-2 border rounded-lg w-full"
+          placeholderText="Date of Birth"
+          dateFormat="yyyy-MM-dd"
+        />
+
+      </div>
+
+      <div className="flex justify-end gap-3 mt-4">
+        <button
+          onClick={() => setIsModalOpen(false)}
+          className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleAddDriver}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
 
       {/* Footer */}
       <div className="text-center text-xs text-gray-400 mt-6">
