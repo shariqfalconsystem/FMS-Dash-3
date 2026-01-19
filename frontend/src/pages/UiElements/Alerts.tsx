@@ -1,183 +1,342 @@
-// FleetManagerAlerts.tsx
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  FaCar,
-  FaGasPump,
-  FaUser,
-  FaMapMarkerAlt,
-  FaCheckCircle,
-  FaExclamationTriangle,
-  FaInfoCircle,
-  FaCheck,
-  FaSearch,
-} from "react-icons/fa";
+  Bell,
+  AlertTriangle,
+  ShieldAlert,
+  Wrench,
+  ArrowUpRight,
+  ArrowDownRight,
+} from "lucide-react";
 
-interface FleetAlert {
-  id: number;
-  type: "Vehicle" | "Fuel" | "Driver" | "Geofence" | "System";
-  severity: "Critical" | "Warning" | "Info" | "Normal";
-  title: string;
+/* ---------------- TYPES ---------------- */
+interface Alert {
+  id: string;
+  vehicleNo: string;
+  deviceId: string;
+  type: "Maintenance" | "Device" | "Compliance" | "Safety";
+  severity: "Low" | "Medium" | "High";
   message: string;
-  timestamp: string;
-  resolved: boolean;
+  date: string;
+  status: "Open" | "Acknowledged" | "Resolved";
 }
 
-// Sample alert data
-const initialAlerts: FleetAlert[] = [
-  { id: 1, type: "Vehicle", severity: "Warning", title: "Maintenance Due", message: "Vehicle DL-01-AX-2345 is due for service (500 km exceeded).", timestamp: "2026-01-16 10:15 AM", resolved: false },
-  { id: 2, type: "Fuel", severity: "Critical", title: "Fuel Theft Detected", message: "Sudden fuel drop detected in Vehicle MH-12-KL-8899.", timestamp: "2026-01-16 09:45 AM", resolved: false },
-  { id: 3, type: "Geofence", severity: "Info", title: "Vehicle Exited Zone", message: "Vehicle KA-09-ZZ-1122 exited assigned zone.", timestamp: "2026-01-16 08:30 AM", resolved: false },
-  { id: 4, type: "Driver", severity: "Warning", title: "Harsh Braking Detected", message: "Driver Ravi exceeded braking threshold.", timestamp: "2026-01-15 05:00 PM", resolved: true },
-  { id: 5, type: "System", severity: "Normal", title: "All Systems Normal", message: "All fleet sensors are functioning normally.", timestamp: "2026-01-15 02:00 PM", resolved: true },
+/* ---------------- DUMMY DATA ---------------- */
+const dummyAlerts: Alert[] = [
+  {
+    id: "ALT-001",
+    vehicleNo: "TRK-001",
+    deviceId: "DEV-001",
+    type: "Maintenance",
+    severity: "High",
+    message: "Maintenance overdue by 5 days",
+    date: "2026-01-14",
+    status: "Open",
+  },
+  {
+    id: "ALT-002",
+    vehicleNo: "VAN-002",
+    deviceId: "DEV-007",
+    type: "Device",
+    severity: "Medium",
+    message: "GPS device disconnected",
+    date: "2026-01-13",
+    status: "Acknowledged",
+  },
+  {
+    id: "ALT-003",
+    vehicleNo: "CAR-001",
+    deviceId: "DEV-004",
+    type: "Compliance",
+    severity: "Low",
+    message: "Insurance expiring in 10 days",
+    date: "2026-01-12",
+    status: "Open",
+  },
+  {
+    id: "ALT-004",
+    vehicleNo: "TRK-003",
+    deviceId: "DEV-005",
+    type: "Safety",
+    severity: "High",
+    message: "Harsh braking detected multiple times",
+    date: "2026-01-11",
+    status: "Resolved",
+  },
+  {
+    id: "ALT-005",
+    vehicleNo: "VAN-003",
+    deviceId: "DEV-010",
+    type: "Maintenance",
+    severity: "Medium",
+    message: "Service due in 3 days",
+    date: "2026-01-10",
+    status: "Open",
+  },
 ];
 
-// Icons for types
-const typeIcons = { Vehicle: FaCar, Fuel: FaGasPump, Driver: FaUser, Geofence: FaMapMarkerAlt, System: FaCheckCircle };
+/* ================= MAIN COMPONENT ================= */
+export default function AlertsDashboard() {
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [loading, setLoading] = useState(true);
 
-// Professional colors for types (modern palette)
-const typeColors = {
-  Vehicle: "border-blue-500 bg-blue-50",
-  Fuel: "border-amber-500 bg-amber-50",
-  Driver: "border-purple-500 bg-purple-50",
-  Geofence: "border-teal-500 bg-teal-50",
-  System: "border-green-500 bg-green-50",
-};
+  // Filters
+  const [search, setSearch] = useState("");
+  const [typeFilter, setTypeFilter] =
+    useState<"All" | Alert["type"]>("All");
 
-// Severity colors (modern, readable)
-const severityColors = {
-  Critical: "bg-red-50 border-red-500 text-red-700",
-  Warning: "bg-orange-50 border-orange-500 text-orange-700",
-  Info: "bg-blue-50 border-blue-500 text-blue-700",
-  Normal: "bg-green-50 border-green-500 text-green-700",
-};
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
-// Severity icons
-const severityIcons = {
-  Critical: <FaExclamationTriangle className="inline mr-1" />,
-  Warning: <FaExclamationTriangle className="inline mr-1" />,
-  Info: <FaInfoCircle className="inline mr-1" />,
-  Normal: <FaCheck className="inline mr-1" />,
-};
+  useEffect(() => {
+    setTimeout(() => {
+      setAlerts(dummyAlerts);
+      setLoading(false);
+    }, 800);
+  }, []);
 
-// Types and Severities for filters
-const alertTypes: FleetAlert["type"][] = ["Vehicle", "Fuel", "Driver", "Geofence", "System"];
-const alertSeverities: FleetAlert["severity"][] = ["Critical", "Warning", "Info", "Normal"];
+  /* ---------------- KPI VALUES ---------------- */
+  const totalAlerts = alerts.length;
+  const openAlerts = alerts.filter(a => a.status === "Open").length;
+  const highSeverity = alerts.filter(a => a.severity === "High").length;
+  const resolvedAlerts = alerts.filter(a => a.status === "Resolved").length;
 
-export default function FleetManagerAlerts() {
-  const [alerts, setAlerts] = useState<FleetAlert[]>(initialAlerts);
-  const [filterType, setFilterType] = useState<"All" | FleetAlert["type"]>("All");
-  const [filterSeverity, setFilterSeverity] = useState<"All" | FleetAlert["severity"]>("All");
-  const [searchText, setSearchText] = useState("");
+  /* ---------------- FILTERED DATA ---------------- */
+  const filteredAlerts = alerts.filter(a =>
+    (typeFilter === "All" || a.type === typeFilter) &&
+    (a.vehicleNo.toLowerCase().includes(search.toLowerCase()) ||
+      a.deviceId.toLowerCase().includes(search.toLowerCase()))
+  );
 
-  const markResolved = (id: number) =>
-    setAlerts((prev) => prev.map((a) => (a.id === id ? { ...a, resolved: true } : a)));
+  const totalPages = Math.ceil(filteredAlerts.length / itemsPerPage);
+  const paginatedAlerts = filteredAlerts.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
-  const filteredAlerts = alerts.filter((alert) => {
-    const typeMatch = filterType === "All" || alert.type === filterType;
-    const severityMatch = filterSeverity === "All" || alert.severity === filterSeverity;
-    const searchMatch = [alert.title, alert.message, alert.type].some((text) =>
-      text.toLowerCase().includes(searchText.toLowerCase())
-    );
-    return typeMatch && severityMatch && searchMatch;
-  });
+  /* ---------------- HELPERS ---------------- */
+  const severityColor = (s: Alert["severity"]) => {
+    switch (s) {
+      case "High":
+        return "bg-red-100 text-red-800";
+      case "Medium":
+        return "bg-yellow-100 text-yellow-800";
+      default:
+        return "bg-green-100 text-green-800";
+    }
+  };
 
+  const statusColor = (s: Alert["status"]) => {
+    switch (s) {
+      case "Open":
+        return "bg-red-100 text-red-700";
+      case "Acknowledged":
+        return "bg-blue-100 text-blue-700";
+      default:
+        return "bg-green-100 text-green-700";
+    }
+  };
+
+  /* ================= UI ================= */
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Fleet Alerts Dashboard</h1>
-
-      {/* Filter & Search Bar */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-        <div className="flex flex-wrap gap-2">
-          {/* Type Filter */}
-          <select
-            value={filterType}
-            onChange={(e) => setFilterType(e.target.value as any)}
-            className="px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-800 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-400"
-          >
-            <option value="All">All Types</option>
-            {alertTypes.map((type) => (
-              <option key={type} value={type}>{type}</option>
-            ))}
-          </select>
-
-          {/* Severity Filter */}
-          <select
-            value={filterSeverity}
-            onChange={(e) => setFilterSeverity(e.target.value as any)}
-            className="px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-800 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-400"
-          >
-            <option value="All">All Severities</option>
-            {alertSeverities.map((sev) => (
-              <option key={sev} value={sev}>{sev}</option>
-            ))}
-          </select>
+    <div className="min-h-screen bg-gray-50 p-6">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-900">
+            Alerts Dashboard
+          </h1>
+          <p className="text-sm text-gray-500">
+            Fleet alerts & notifications overview
+          </p>
         </div>
-
-        {/* Search Box */}
-        <div className="flex items-center w-full md:w-1/3 bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus-within:ring-1 focus-within:ring-indigo-400 transition">
-          <FaSearch className="text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search alerts..."
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            className="flex-1 ml-2 border-none focus:outline-none bg-transparent text-gray-800"
-          />
+        <div className="flex items-center gap-2 text-gray-500 text-sm">
+          <Bell className="w-5 h-5" />
+          Fleet Manager View
         </div>
       </div>
 
-      {/* Alerts Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredAlerts.length > 0 ? (
-          filteredAlerts.map((alert) => {
-            const TypeIcon = typeIcons[alert.type];
-            return (
-              <div
-                key={alert.id}
-                className={`bg-white rounded-lg border-l-4 p-5 shadow-sm hover:shadow-lg transition ${typeColors[alert.type]}`}
-              >
-                <div className="flex justify-between items-start mb-3">
-                  <div className="flex items-center gap-2">
-                    <TypeIcon className="text-xl text-gray-700" />
-                    <span className="font-semibold text-gray-900">{alert.type}</span>
-                  </div>
+      {/* KPI CARDS */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <KpiCard title="Total Alerts" value={totalAlerts} color="gray" />
+        <KpiCard title="Open Alerts" value={openAlerts} color="red" trend="+3" />
+        <KpiCard
+          title="High Severity"
+          value={highSeverity}
+          color="red"
+          trend="+1"
+        />
+        <KpiCard
+          title="Resolved Alerts"
+          value={resolvedAlerts}
+          color="green"
+          trend="+4"
+        />
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-col sm:flex-row gap-4 mb-4">
+        <input
+          className="px-4 py-2 border rounded-lg w-full sm:w-1/3"
+          placeholder="Search by Vehicle / Device ID"
+          value={search}
+          onChange={e => {
+            setSearch(e.target.value);
+            setCurrentPage(1);
+          }}
+        />
+        <select
+          className="px-4 py-2 border rounded-lg"
+          value={typeFilter}
+          onChange={e => {
+            setTypeFilter(e.target.value as any);
+            setCurrentPage(1);
+          }}
+        >
+          <option value="All">All Alert Types</option>
+          <option value="Maintenance">Maintenance</option>
+          <option value="Device">Device</option>
+          <option value="Compliance">Compliance</option>
+          <option value="Safety">Safety</option>
+        </select>
+      </div>
+
+      {/* TABLE */}
+      <div className="bg-white rounded-2xl shadow overflow-x-auto">
+        <table className="min-w-full text-sm divide-y divide-gray-200">
+          <thead className="bg-gray-100 text-gray-600">
+            <tr>
+              <th className="px-6 py-3 text-left">Vehicle</th>
+              <th className="px-6 py-3 text-left">Device</th>
+              <th className="px-6 py-3 text-left">Type</th>
+              <th className="px-6 py-3 text-left">Severity</th>
+              <th className="px-6 py-3 text-left">Status</th>
+              <th className="px-6 py-3 text-left">Date</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {paginatedAlerts.map(alert => (
+              <tr key={alert.id} className="hover:bg-gray-50">
+                <td className="px-6 py-4 font-medium">
+                  {alert.vehicleNo}
+                </td>
+                <td className="px-6 py-4 text-gray-600">
+                  {alert.deviceId}
+                </td>
+                <td className="px-6 py-4">{alert.type}</td>
+                <td className="px-6 py-4">
                   <span
-                    className={`flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full border ${severityColors[alert.severity]}`}
+                    className={`px-2 py-1 rounded-full text-xs font-semibold ${severityColor(
+                      alert.severity
+                    )}`}
                   >
-                    {severityIcons[alert.severity]}
                     {alert.severity}
                   </span>
-                </div>
-
-                <h3 className="text-lg font-semibold text-gray-900">{alert.title}</h3>
-                <p className="text-gray-700 mt-1">{alert.message}</p>
-
-                <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
-                  <span>{alert.timestamp}</span>
+                </td>
+                <td className="px-6 py-4">
                   <span
-                    className={`px-2 py-1 rounded-full font-semibold ${
-                      alert.resolved ? "bg-gray-200 text-gray-800" : "bg-red-50 text-red-700"
-                    }`}
+                    className={`px-2 py-1 rounded-full text-xs font-semibold ${statusColor(
+                      alert.status
+                    )}`}
                   >
-                    {alert.resolved ? "Resolved" : "Active"}
+                    {alert.status}
                   </span>
-                </div>
+                </td>
+                <td className="px-6 py-4 text-gray-600">
+                  {alert.date}
+                </td>
+              </tr>
+            ))}
 
-                {!alert.resolved && (
-                  <button
-                    onClick={() => markResolved(alert.id)}
-                    className="mt-3 w-full bg-indigo-50 text-indigo-700 rounded-lg px-3 py-2 text-sm font-medium hover:bg-indigo-100 transition"
-                  >
-                    Mark Resolved
-                  </button>
-                )}
-              </div>
-            );
-          })
-        ) : (
-          <p className="col-span-full text-center text-gray-500">No alerts found.</p>
-        )}
+            {!loading && filteredAlerts.length === 0 && (
+              <tr>
+                <td
+                  colSpan={6}
+                  className="px-6 py-6 text-center text-gray-500"
+                >
+                  No alerts found
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+
+        {/* Pagination */}
+        <div className="flex justify-end gap-2 px-6 py-3 bg-gray-50">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(p => p - 1)}
+            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+          >
+            Prev
+          </button>
+          <span className="text-sm">
+            Page {currentPage} of {totalPages || 1}
+          </span>
+          <button
+            disabled={currentPage === totalPages || totalPages === 0}
+            onClick={() => setCurrentPage(p => p + 1)}
+            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+
+      <div className="text-center text-xs text-gray-400 mt-6">
+        © 2026 Fleet Manager – Alerts Module
       </div>
     </div>
   );
 }
+
+/* ================= KPI CARD ================= */
+interface KpiCardProps {
+  title: string;
+  value: number;
+  color: "gray" | "red" | "green";
+  trend?: string;
+}
+
+const KpiCard: React.FC<KpiCardProps> = ({
+  title,
+  value,
+  color,
+  trend,
+}) => {
+  const textColor =
+    color === "red"
+      ? "text-red-700"
+      : color === "green"
+      ? "text-green-700"
+      : "text-gray-800";
+
+  const trendArrow =
+    trend?.startsWith("-") ? (
+      <ArrowDownRight className="w-4 h-4 inline-block" />
+    ) : (
+      <ArrowUpRight className="w-4 h-4 inline-block" />
+    );
+
+  return (
+    <div className="bg-white rounded-2xl shadow-md p-5 hover:shadow-lg transition">
+      <p className="text-sm text-gray-500">{title}</p>
+      <div className="mt-2 flex items-center gap-2">
+        <p className={`text-3xl font-semibold ${textColor}`}>
+          {value}
+        </p>
+        {trend && (
+          <span
+            className={`text-sm font-semibold ${
+              trend.startsWith("-")
+                ? "text-red-600"
+                : "text-green-600"
+            }`}
+          >
+            {trendArrow} {trend}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+};
