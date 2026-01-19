@@ -79,12 +79,10 @@ export default function AlertsDashboard() {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Filters
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] =
     useState<"All" | Alert["type"]>("All");
 
-  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
@@ -100,6 +98,9 @@ export default function AlertsDashboard() {
   const openAlerts = alerts.filter(a => a.status === "Open").length;
   const highSeverity = alerts.filter(a => a.severity === "High").length;
   const resolvedAlerts = alerts.filter(a => a.status === "Resolved").length;
+
+  const percentage = (value: number) =>
+    totalAlerts === 0 ? 0 : Math.round((value / totalAlerts) * 100);
 
   /* ---------------- FILTERED DATA ---------------- */
   const filteredAlerts = alerts.filter(a =>
@@ -158,17 +159,41 @@ export default function AlertsDashboard() {
 
       {/* KPI CARDS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <KpiCard title="Total Alerts" value={totalAlerts} color="gray" />
-        <KpiCard title="Open Alerts" value={openAlerts} color="red" trend="+3" />
+        <KpiCard
+          title="Total Alerts"
+          value={totalAlerts}
+          subtitle="All system generated alerts"
+          percentage={percentage(totalAlerts)}
+          icon={<Bell />}
+          color="gray"
+        />
+
+        <KpiCard
+          title="Open Alerts"
+          value={openAlerts}
+          subtitle="Require immediate action"
+          percentage={percentage(openAlerts)}
+          icon={<AlertTriangle />}
+          color="red"
+          trend="+3"
+        />
+
         <KpiCard
           title="High Severity"
           value={highSeverity}
+          subtitle="Critical fleet risks"
+          percentage={percentage(highSeverity)}
+          icon={<ShieldAlert />}
           color="red"
           trend="+1"
         />
+
         <KpiCard
           title="Resolved Alerts"
           value={resolvedAlerts}
+          subtitle="Issues already handled"
+          percentage={percentage(resolvedAlerts)}
+          icon={<Wrench />}
           color="green"
           trend="+4"
         />
@@ -217,70 +242,24 @@ export default function AlertsDashboard() {
           <tbody className="divide-y divide-gray-100">
             {paginatedAlerts.map(alert => (
               <tr key={alert.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 font-medium">
-                  {alert.vehicleNo}
-                </td>
-                <td className="px-6 py-4 text-gray-600">
-                  {alert.deviceId}
-                </td>
+                <td className="px-6 py-4 font-medium">{alert.vehicleNo}</td>
+                <td className="px-6 py-4 text-gray-600">{alert.deviceId}</td>
                 <td className="px-6 py-4">{alert.type}</td>
                 <td className="px-6 py-4">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-semibold ${severityColor(
-                      alert.severity
-                    )}`}
-                  >
+                  <span className={`px-2 py-1 rounded-full text-xs font-semibold ${severityColor(alert.severity)}`}>
                     {alert.severity}
                   </span>
                 </td>
                 <td className="px-6 py-4">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-semibold ${statusColor(
-                      alert.status
-                    )}`}
-                  >
+                  <span className={`px-2 py-1 rounded-full text-xs font-semibold ${statusColor(alert.status)}`}>
                     {alert.status}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-gray-600">
-                  {alert.date}
-                </td>
+                <td className="px-6 py-4 text-gray-600">{alert.date}</td>
               </tr>
             ))}
-
-            {!loading && filteredAlerts.length === 0 && (
-              <tr>
-                <td
-                  colSpan={6}
-                  className="px-6 py-6 text-center text-gray-500"
-                >
-                  No alerts found
-                </td>
-              </tr>
-            )}
           </tbody>
         </table>
-
-        {/* Pagination */}
-        <div className="flex justify-end gap-2 px-6 py-3 bg-gray-50">
-          <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage(p => p - 1)}
-            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-          >
-            Prev
-          </button>
-          <span className="text-sm">
-            Page {currentPage} of {totalPages || 1}
-          </span>
-          <button
-            disabled={currentPage === totalPages || totalPages === 0}
-            onClick={() => setCurrentPage(p => p + 1)}
-            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-          >
-            Next
-          </button>
-        </div>
       </div>
 
       <div className="text-center text-xs text-gray-400 mt-6">
@@ -293,14 +272,20 @@ export default function AlertsDashboard() {
 /* ================= KPI CARD ================= */
 interface KpiCardProps {
   title: string;
+  subtitle: string;
   value: number;
+  percentage: number;
+  icon: React.ReactNode;
   color: "gray" | "red" | "green";
   trend?: string;
 }
 
 const KpiCard: React.FC<KpiCardProps> = ({
   title,
+  subtitle,
   value,
+  percentage,
+  icon,
   color,
   trend,
 }) => {
@@ -311,6 +296,13 @@ const KpiCard: React.FC<KpiCardProps> = ({
       ? "text-green-700"
       : "text-gray-800";
 
+  const iconBg =
+    color === "red"
+      ? "bg-red-100 text-red-600"
+      : color === "green"
+      ? "bg-green-100 text-green-600"
+      : "bg-gray-100 text-gray-600";
+
   const trendArrow =
     trend?.startsWith("-") ? (
       <ArrowDownRight className="w-4 h-4 inline-block" />
@@ -320,11 +312,20 @@ const KpiCard: React.FC<KpiCardProps> = ({
 
   return (
     <div className="bg-white rounded-2xl shadow-md p-5 hover:shadow-lg transition">
-      <p className="text-sm text-gray-500">{title}</p>
-      <div className="mt-2 flex items-center gap-2">
-        <p className={`text-3xl font-semibold ${textColor}`}>
-          {value}
-        </p>
+      <div className="flex justify-between items-start">
+        <div>
+          <p className="text-sm text-gray-500">{title}</p>
+          <p className="text-xs text-gray-400">{subtitle}</p>
+        </div>
+        <div className={`p-2 rounded-xl ${iconBg}`}>{icon}</div>
+      </div>
+
+      <div className="mt-4 flex items-end justify-between">
+        <div>
+          <p className={`text-3xl font-semibold ${textColor}`}>{value}</p>
+          <p className="text-xs text-gray-400">{percentage}% of total alerts</p>
+        </div>
+
         {trend && (
           <span
             className={`text-sm font-semibold ${
