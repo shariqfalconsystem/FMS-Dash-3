@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Device } from "../../types/device";
 import DownloadMenu from "./VehicleListDownloadButton";
 import VehicleCard from "./LiveVehicleCard";
+import { Skeleton } from "../ui/skeleton";
 
 const TABS = [
   "All",
@@ -34,37 +35,37 @@ export default function VehicleListPanel({
 
   const filteredDevices = useMemo(() => {
     switch (activeTab) {
-            case "Running":
-              return devices.filter(d => d.Online && (d.Speed ?? 0) > 0);
+      case "Running":
+        return devices.filter(d => d.Online && (d.Speed ?? 0) > 0);
 
-            case "Idle":
-              return devices.filter(d => d.Online && (d.Speed ?? 0) === 0);
+      case "Idle":
+        return devices.filter(d => d.Online && (d.Speed ?? 0) === 0);
 
-            case "Stopped":
-              return devices.filter(d => !d.Online);
+      case "Stopped":
+        return devices.filter(d => !d.Online);
 
-            case "Unhealthy":
-              return devices.filter(d => d.Unhealthy === true);
+      case "Unhealthy":
+        return devices.filter(d => d.Unhealthy === true);
 
-            case "POI":
-              return devices.filter(d => Boolean(d.Poi));
+      case "POI":
+        return devices.filter(d => Boolean(d.Poi));
 
-            case "Alerts":
-              return devices.filter(d => (d.AlertCount ?? 0) > 0);
+      case "Alerts":
+        return devices.filter(d => (d.AlertCount ?? 0) > 0);
 
-            case "Not Working":
-              return devices.filter(d => d.NotWorking === true);
+      case "Not Working":
+        return devices.filter(d => d.NotWorking === true);
 
-            case "Non Active":
-              return devices.filter(d => !d.Online || d.NotWorking === true);
+      case "Non Active":
+        return devices.filter(d => !d.Online || d.NotWorking === true);
 
-            default:
-              return devices;
-          }
-    }, [devices, activeTab]);
+      default:
+        return devices;
+    }
+  }, [devices, activeTab]);
 
   return (
-    <div className="w-[420px] border-r bg-gray-50 flex flex-col">
+    <div className="w-[420px] border-r flex flex-col bg-white">
       <div className="flex items-center justify-between border-b bg-white px-6 py-3 dark:bg-black">
         <h2 className="text-lg font-semibold">Live Tracking</h2>
       </div>
@@ -99,7 +100,11 @@ export default function VehicleListPanel({
       {/* LIST */}
       <div className="flex-1 overflow-y-auto space-y-3 pt-3">
         {loading ? (
-          <p className="text-sm text-gray-500">Loading vehicles…</p>
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-[250px]" />
+            <Skeleton className="h-4 w-[200px]" />
+            <Skeleton className="h-4 w-[250px]" />
+          </div>
         ) : (
           filteredDevices.map((d, i) => (
             <VehicleCard
