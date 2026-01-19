@@ -139,7 +139,7 @@ export default function AlertsDashboard() {
 
   /* ================= UI ================= */
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen p-6">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
