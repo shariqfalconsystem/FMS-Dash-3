@@ -11,9 +11,9 @@ import NotificationsPage from "./pages/NotificationsPage";
 import LiveTracking from "./pages/LiveTracking";
 import Maintenance from "./pages/Maintenance";
 import Dashboard from "./pages/Dashboard";
-import { Reports } from "./pages/Reports";
 import TripsDashboard from "./pages/Trips";
 import DriversDashboard from "./pages/Drivers";
+import { Reports } from "./pages/Reports";
 
 export default function App() {
 
@@ -38,7 +38,7 @@ export default function App() {
             <Route path="fleet/notifications" element={<NotificationsPage />} />
             <Route path="/vehicles" element={<Vehicles />} />
             <Route path="/maintenance" element={<Maintenance />} />
-            <Route path="/reports" element={<Reports />} />
+            <Route path="/reports" element={<Reports/>} />
             <Route path="/trips" element={<TripsDashboard />} />
             <Route path="/drivers" element={<DriversDashboard />} />
 

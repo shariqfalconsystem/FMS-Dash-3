@@ -91,7 +91,7 @@ export default function LiveTracking() {
     <div className="flex h-screen flex-col fixed top-16">
       <div className="flex flex-1 overflow-hidden">
         {/* LEFT PANEL */}
-        <div className="relative flex z-10">
+        <div className="relative flex z-10 w-[840px]">
           <VehicleListPanel
             devices={devices}
             loading={loading}
