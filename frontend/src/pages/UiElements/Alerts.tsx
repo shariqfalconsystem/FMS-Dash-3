@@ -109,7 +109,6 @@ export default function AlertsDashboard() {
       a.deviceId.toLowerCase().includes(search.toLowerCase()))
   );
 
-  const totalPages = Math.ceil(filteredAlerts.length / itemsPerPage);
   const paginatedAlerts = filteredAlerts.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -211,7 +210,7 @@ export default function AlertsDashboard() {
           }}
         />
         <select
-          className="px-4 py-2 border rounded-lg"
+          className="px-4 py-2 border rounded-lg cursor-pointer"
           value={typeFilter}
           onChange={e => {
             setTypeFilter(e.target.value as any);
@@ -241,17 +240,28 @@ export default function AlertsDashboard() {
           </thead>
           <tbody className="divide-y divide-gray-100">
             {paginatedAlerts.map(alert => (
-              <tr key={alert.id} className="hover:bg-gray-50">
+              <tr
+                key={alert.id}
+                className="hover:bg-gray-50 cursor-pointer"
+              >
                 <td className="px-6 py-4 font-medium">{alert.vehicleNo}</td>
                 <td className="px-6 py-4 text-gray-600">{alert.deviceId}</td>
                 <td className="px-6 py-4">{alert.type}</td>
                 <td className="px-6 py-4">
-                  <span className={`px-2 py-1 rounded-full text-xs font-semibold ${severityColor(alert.severity)}`}>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-semibold ${severityColor(
+                      alert.severity
+                    )}`}
+                  >
                     {alert.severity}
                   </span>
                 </td>
                 <td className="px-6 py-4">
-                  <span className={`px-2 py-1 rounded-full text-xs font-semibold ${statusColor(alert.status)}`}>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-semibold ${statusColor(
+                      alert.status
+                    )}`}
+                  >
                     {alert.status}
                   </span>
                 </td>
@@ -311,7 +321,7 @@ const KpiCard: React.FC<KpiCardProps> = ({
     );
 
   return (
-    <div className="bg-white rounded-2xl shadow-md p-5 hover:shadow-lg transition">
+    <div className="bg-white rounded-2xl shadow-md p-5 hover:shadow-lg transition cursor-pointer">
       <div className="flex justify-between items-start">
         <div>
           <p className="text-sm text-gray-500">{title}</p>
@@ -323,7 +333,9 @@ const KpiCard: React.FC<KpiCardProps> = ({
       <div className="mt-4 flex items-end justify-between">
         <div>
           <p className={`text-3xl font-semibold ${textColor}`}>{value}</p>
-          <p className="text-xs text-gray-400">{percentage}% of total alerts</p>
+          <p className="text-xs text-gray-400">
+            {percentage}% of total alerts
+          </p>
         </div>
 
         {trend && (
