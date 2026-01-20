@@ -31,4 +31,5 @@ export interface Device {
 
   LastContact?: string;  
   LastUpdate?: string;
+  LiveStreamUrl?: string;
 }

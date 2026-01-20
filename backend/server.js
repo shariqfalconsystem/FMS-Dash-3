@@ -32,72 +32,6 @@ app.get("/api/v1/devices", async (req, res) => {
   }
 });
 
-app.get("/api/v1/live-vehicles", async (req, res) => {
-  try {
-    const { data } = await axios.get(GTRAC_URL, {
-      params: { token: TOKEN, userid: USER_ID, puserid: PUSER_ID, mode: "" }
-    });
-
-    const list = data?.data || [];
-    const result = list.map(v => ({
-      deviceId: v.deviceid,
-      vehicleNumber: v.vehicleno,
-      lat: Number(v.lat),
-      lng: Number(v.lng),
-      speed: Number(v.speed),
-      online: Boolean(v.online),
-      ignition: v.ignition,
-      lastUpdated: v.lastupdated,
-      driverName: v.drivername,
-      driverPhone: v.driverphone
-    }));
-
-    res.json(result);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to fetch live vehicles" });
-  }
-});
-
-app.get("/api/v1/vehicles", async (req, res) => {
-  const { data } = await axios.get(GTRAC_URL, {
-    params: { token: TOKEN, userid: USER_ID, puserid: PUSER_ID, mode: "" }
-  });
-
-  const list = data?.data || [];
-  const vehicles = list.map(v => ({
-    vehicleId: v.deviceid,
-    vehicleNumber: v.vehicleno,
-    status:
-      v.online == 1
-        ? v.speed > 0
-          ? "Running"
-          : "Idle"
-        : "Offline",
-    lat: v.lat,
-    lng: v.lng,
-    speed: v.speed
-  }));
-
-  res.json(vehicles);
-});
-
-app.get("/api/v1/drivers", async (req, res) => {
-  const { data } = await axios.get(GTRAC_URL, {
-    params: { token: TOKEN, userid: USER_ID, puserid: PUSER_ID, mode: "" }
-  });
-
-  const list = data?.data || [];
-  const drivers = list
-    .filter(v => v.drivername)
-    .map(v => ({
-      driverName: v.drivername,
-      driverPhone: v.driverphone,
-      vehicleNumber: v.vehicleno
-    }));
-
-  res.json(drivers);
-});
-
 const PATH_URL = "https://gtrac.in:8081/trackingDashboard/getpathwithDateDaignostic";
 
 app.get("/api/v1/vehicle-path", async (req, res) => {
@@ -121,21 +55,23 @@ app.get("/api/v1/vehicle-path", async (req, res) => {
     });
 
     const apiData = response.data;
-
+    
     const pathArr = apiData?.patharry || [];
-
+    
     const path = Array.isArray(pathArr)
-      ? pathArr
-        .filter(p => p.lat && p.lng)
-        .map(p => ({
-          lat: Number(p.lat),
-          lng: Number(p.lng),
-          speed: Number(p.speed || 0),
-          time: p.datetime || null
-        }))
-      : [];
-
+    ? pathArr
+    .filter(p => p.lat && p.lng)
+    .map(p => ({
+      lat: Number(p.lat),
+      lng: Number(p.lng),
+      speed: Number(p.speed || 0),
+      time: p.datetime || null
+    }))
+    : [];
+    
     // 👇 THIS is what frontend needs
+    // const data = await res.json();
+    // console.log("stoppageTime" Data)
     res.json({
       summary: {
         vehicleId: apiData.vehicleId,
@@ -160,47 +96,38 @@ app.get("/api/v1/vehicle-path", async (req, res) => {
   }
 });
 
+const ITINERARY_URL =
+  "https://gtrac.in:8081/trackingDashboard/GetItineraryvehIdBDateNwStmeh";
 
-// app.get("/api/v1/vehicle-path", async (req, res) => {
-//   try {
-//     let { vehicleId, start, end } = req.query;
-//     const startDateTime = `${start} 00:00:00`;
-//     const endDateTime = `${end} 23:59:59`;
+app.get("/api/v1/vehicle-itinerary", async (req, res) => {
+  try {
+    const { vehicleId, start, end } = req.query;
 
-//     const apiParams = {
-//       vId: vehicleId,
-//       startdate: startDateTime,
-//       enddate: endDateTime,
-//       requestfor: 0,
-//       userid: USER_ID
-//     };
+    if (!vehicleId || !start || !end) {
+      return res.status(400).json({ error: "Missing parameters" });
+    }
 
-//     const response = await axios.get(PATH_URL, {
-//       params: apiParams,
-//       timeout: 30000
-//     });
+    const response = await axios.get(ITINERARY_URL, {
+      params: {
+        vId: vehicleId,
+        startdate: start,
+        enddate: end,
+        requestfor: 0,
+        userid: USER_ID,
+      },
+      timeout: 30000,
+    });
 
-//     const pathArr = response.data?.patharry || [];
+    // GTRAC usually returns data in `data` or similar
+    res.json(response.data);
 
-//     if (!Array.isArray(pathArr)) {
-//       return res.status(500).json({ error: "Invalid API response" });
-//     }
+  } catch (err) {
+    console.error("❌ Itinerary API error:", err.message);
+    res.status(500).json({ error: "Failed to fetch itinerary" });
+  }
+});
 
-//     const points = pathArr
-//       .filter(p => p.lat && p.lng)
-//       .map(p => ({
-//         lat: Number(p.lat),
-//         lng: Number(p.lng),
-//         speed: Number(p.speed || 0),
-//         time: p.datetime || null
-//       }));
 
-//     res.json(points);
-//   } catch (err) {
-//     console.error("❌ Backend error:", err.message);
-//     res.status(500).json({ error: "Failed to fetch path" });
-//   }
-// });
 
 
 app.listen(PORT, () => {

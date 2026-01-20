@@ -97,7 +97,7 @@ export default function LiveFleetMap({
   return (
     <div className="fixed inset-0 left-120">
       <GoogleMap
-      center={INDIA_CENTER}
+      // center={INDIA_CENTER}
         zoom={5}
         mapContainerStyle={{ width: "100%", height: "100%" }}
         onLoad={(map) => {

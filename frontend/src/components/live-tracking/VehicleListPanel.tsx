@@ -23,6 +23,7 @@ interface Props {
   loading: boolean;
   onSelect: (d: Device) => void;    // opens drawer (marker/card select)
   onShowRoute: (d: Device) => void; // draw polyline when card clicked
+  onVideoClick: (d: Device) => void;
 }
 
 export default function VehicleListPanel({
@@ -30,6 +31,7 @@ export default function VehicleListPanel({
   loading,
   onSelect,
   onShowRoute,
+  onVideoClick,
 }: Props) {
   const [activeTab, setActiveTab] = useState<TabType>("All");
 
@@ -112,6 +114,7 @@ export default function VehicleListPanel({
               device={d}
               onSelect={onSelect}
               onShowRoute={onShowRoute} // pass new prop
+              onVideoClick={onVideoClick}
             />
           ))
         )}

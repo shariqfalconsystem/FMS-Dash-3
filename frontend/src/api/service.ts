@@ -18,3 +18,9 @@ export const getAlerts = async () => {
   const response = await axios.get(`${API_BASE}/alerts`);
   return response.data;
 };
+
+// Optional: Vedio API
+export const getLiveStreams = async () => {
+  const res = await axios.get("/live-stream"); // your backend
+  return res.data;
+};

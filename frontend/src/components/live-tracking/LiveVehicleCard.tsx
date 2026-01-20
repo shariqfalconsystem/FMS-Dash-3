@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { DriverPopup } from "./DriverPopup";
 import { Device } from "../../types/device";
-import { handleToggleButton } from "../common/handleToggleButton";
 import {
   Satellite,
   Fuel,
@@ -11,16 +10,19 @@ import {
   Target,
   User,
   Pencil,
+  Video,
 } from "lucide-react";
 
 function VehicleCard({
   device,
   onSelect,
   onShowRoute,
+  onVideoClick,
 }: {
   device: Device;
   onSelect: (d: Device) => void;
   onShowRoute: (d: Device) => void; // NEW
+  onVideoClick: (d: Device) => void;
 }) {
   const [showDriverPopup, setShowDriverPopup] = useState(false);
 
@@ -58,10 +60,15 @@ function VehicleCard({
 
               {/* FEATURE ICONS */}
               <div className="flex gap-1 text-gray-500">
-                <Satellite size={14} />
-                <Fuel size={14} />
+                <Video size={18}
+                  className="cursor-pointer hover:text-blue-600"
+                  onClick={(e) => {
+                    e.stopPropagation(); // 🚨 prevents card click
+                    onVideoClick(device);
+                  }} />
+                {/* <Fuel size={14} />
                 <Lock size={14} />
-                <AlertTriangle size={14} />
+                <AlertTriangle size={14} /> */}
               </div>
             </div>
 

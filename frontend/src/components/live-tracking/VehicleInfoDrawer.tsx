@@ -8,30 +8,37 @@ import {
   Play,
   Pause,
   MapPin,
+  AlertTriangle,
 } from "lucide-react";
 import { DashboardSummary } from "../../api/pathApi";
 import { useDateRangeFilter } from "../common/useDateRangeFilter";
 import { DateRangeFilter } from "../common/DateRangeFilter";
+import { getVehicleItinerary, ItineraryEvent } from "../../api/itineraryApi";
+import { Skeleton } from "../ui/skeleton";
 
 type TabType = "ALL" | "MOVEMENT" | "STOPPAGES" | "DIAGNOSTIC" | "ALERTS";
 
 interface Props {
   device: Device;
   dashboard: DashboardSummary;
+  itinerary: ItineraryEvent[];
   onClose: () => void;
 }
 
-export default function VehicleInfoDrawer({ device, dashboard, onClose }: Props) {
+export default function VehicleInfoDrawer({
+  device,
+  dashboard,
+  itinerary,
+  onClose,
+}: Props) {
   const [activeTab, setActiveTab] = useState<TabType>("ALL");
+  const [loadingTimeline, setLoadingTimeline] = useState(false);
 
   // ✅ reusable date-range hook
-  const { filter, setFilter, range, setRange, start, end } = useDateRangeFilter();
+  const { filter, setFilter, range, setRange, start, end } =
+    useDateRangeFilter();
 
-  /* ---------------- DERIVED DATA ---------------- */
-
-  const isRunning = device.Online && (device.Speed ?? 0) > 0;
-  const isStopped = !device.Online;
-  const isIdle = device.Online && (device.Speed ?? 0) === 0;
+  /* ---------------- DATE HELPERS ---------------- */
 
   const formatDate = (d: Date) =>
     d.toLocaleDateString("en-GB", {
@@ -49,14 +56,65 @@ export default function VehicleInfoDrawer({ device, dashboard, onClose }: Props)
       minute: "2-digit",
     });
 
+
+  /* ---------------- TIMELINE HELPERS ---------------- */
+
+  const getTimelineIcon = (type: ItineraryEvent["type"]) => {
+    switch (type) {
+      case "RUN":
+        return <Play className="h-4 w-4 text-green-600" />;
+      case "STOP":
+        return <Pause className="h-4 w-4 text-red-600" />;
+      case "IDLE":
+        return <Pause className="h-4 w-4 text-yellow-600" />;
+      case "DIAGNOSTIC":
+        return <Settings className="h-4 w-4 text-blue-600" />;
+      case "ALERT":
+        return <AlertTriangle className="h-4 w-4 text-orange-600" />;
+      default:
+        return <Pause className="h-4 w-4 text-gray-400" />;
+    }
+  };
+
+  const getTimelineTitle = (type: ItineraryEvent["type"]) => {
+    switch (type) {
+      case "RUN":
+        return "Vehicle Running";
+      case "STOP":
+        return "Vehicle Stopped";
+      case "IDLE":
+        return "Vehicle Idle";
+      case "DIAGNOSTIC":
+        return "Diagnostic Event";
+      case "ALERT":
+        return "Alert Triggered";
+      default:
+        return "Event";
+    }
+  };
+
+  const formatTimelineTime = (e: ItineraryEvent) => {
+    if (e.startTime && e.endTime) {
+      return `${e.startTime} → ${e.endTime}`;
+    }
+    return e.startTime || "—";
+  };
+
+  // /* ---------------- FILTER BY TAB ---------------- */
+
+  const filteredTimeline = itinerary.filter((e) => {
+    if (activeTab === "ALL") return true;
+    if (activeTab === "MOVEMENT") return e.type === "RUN" || e.type === "IDLE";
+    if (activeTab === "STOPPAGES") return e.type === "STOP";
+    if (activeTab === "DIAGNOSTIC") return e.type === "DIAGNOSTIC";
+    if (activeTab === "ALERTS") return e.type === "ALERT";
+    return true;
+  });
+
   /* ---------------- HANDLERS ---------------- */
 
   const handleRefresh = () => {
-    console.log("Refreshing data for", device.DeviceID);
-  };
-
-  const handleSettings = () => {
-    alert("Vehicle settings coming soon");
+    console.log("Refresh requested");
   };
 
   const handleTimelineClick = (event: string) => {
@@ -73,31 +131,16 @@ export default function VehicleInfoDrawer({ device, dashboard, onClose }: Props)
 
         <div className="flex items-center gap-3 text-gray-600">
           <Maximize2 className="h-5 w-5 cursor-pointer" />
-          <RefreshCcw className="h-5 w-5 cursor-pointer" onClick={handleRefresh} />
-          <Settings className="h-5 w-5 cursor-pointer" onClick={handleSettings} />
+          <RefreshCcw
+            className="h-5 w-5 cursor-pointer"
+            onClick={handleRefresh}
+          />
+          <Settings className="h-5 w-5 cursor-pointer" />
           <X className="h-5 w-5 cursor-pointer" onClick={onClose} />
         </div>
       </div>
 
-      {/* DATE FILTER (OLD – KEPT AS REQUESTED) */}
-      {/* <div className="border-b p-4">
-        <select
-          value={dateFilter}
-          onChange={(e) => setDateFilter(e.target.value)}
-          className="w-full rounded-lg border px-3 py-2 text-sm"
-        >
-          <option>Today</option>
-          <option>Yesterday</option>
-          <option>Custom</option>
-        </select>
-
-        <div className="mt-2 flex justify-between text-xs text-gray-600">
-          <span>{`${StartTime}, 00:00`}</span>
-          <span>{}</span>
-        </div>
-      </div> */}
-
-      {/* ✅ NEW reusable date filter */}
+      {/* DATE FILTER */}
       <DateRangeFilter
         filter={filter}
         onFilterChange={setFilter}
@@ -113,17 +156,22 @@ export default function VehicleInfoDrawer({ device, dashboard, onClose }: Props)
       {/* SUMMARY */}
       <div className="grid grid-cols-3 divide-x border-b text-center">
         <SummaryItem label="Running Time" value={dashboard.runningTime || "—"} />
-        <SummaryItem label="Total Distance" value={dashboard.totalDistance} />
-        <SummaryItem label="Stopped Time" value={dashboard.stoppageTime || "—"} />
+        <SummaryItem
+          label="Total Distance"
+          value={dashboard.totalDistance}
+        />
+        <SummaryItem
+          label="Stopped Time"
+          value={dashboard.stoppageTime || "—"}
+        />
       </div>
 
       {/* LOCATION */}
       <div className="border-b p-4">
         <div className="flex items-start gap-2">
           <span
-            className={`mt-1 h-2 w-2 rounded-full ${
-              device.Online ? "bg-teal-500" : "bg-red-500"
-            }`}
+            className={`mt-1 h-2 w-2 rounded-full ${device.Online ? "bg-teal-500" : "bg-red-500"
+              }`}
           />
           <div>
             <p className="text-sm font-medium flex items-center gap-1 text-gray-800">
@@ -133,59 +181,61 @@ export default function VehicleInfoDrawer({ device, dashboard, onClose }: Props)
               </span>
             </p>
             <p className="text-xs text-gray-500">
-              Updated At: {dashboard.toTime ? formatDateTime(new Date(dashboard.toTime)) : "N/A"}
+              Updated At:{" "}
+              {dashboard.toTime
+                ? formatDateTime(new Date(dashboard.toTime))
+                : "N/A"}
             </p>
           </div>
         </div>
       </div>
 
       {/* TABS */}
-      <div className="flex gap-6 border-b px-4 pt-3 text-sm">
-        <Tab label="All" active={activeTab === "ALL"} onClick={() => setActiveTab("ALL")} />
-        <Tab label="Movement" active={activeTab === "MOVEMENT"} onClick={() => setActiveTab("MOVEMENT")} />
-        <Tab label="Stoppages" active={activeTab === "STOPPAGES"} onClick={() => setActiveTab("STOPPAGES")} />
-        <Tab label="Diagnostic" active={activeTab === "DIAGNOSTIC"} onClick={() => setActiveTab("DIAGNOSTIC")} />
-        <Tab label="Alerts" active={activeTab === "ALERTS"} onClick={() => setActiveTab("ALERTS")} />
+      <div className="flex gap-4 border-b px-4 pt-3 text-sm">
+        {["ALL", "MOVEMENT", "STOPPAGES", "DIAGNOSTIC", "ALERTS"].map((t) => (
+          <Tab
+            key={t}
+            label={t}
+            active={activeTab === t}
+            onClick={() => setActiveTab(t as TabType)}
+          />
+        ))}
       </div>
 
       {/* TIMELINE */}
       <div className="p-4 space-y-4">
-        {(activeTab === "ALL" || activeTab === "MOVEMENT") && isRunning && (
-          <TimelineCard
-            icon={<Play className="h-4 w-4 text-green-600" />}
-            title="Vehicle Running"
-            distance={dashboard.totalDistance}
-            location={device.Address || "—"}
-            time={dashboard.runningTime || "—"}
-            onClick={() => handleTimelineClick("RUN")}
-          />
+        {loadingTimeline && (
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-[250px]" />
+            <Skeleton className="h-4 w-[200px]" />
+            <Skeleton className="h-4 w-[250px]" />
+          </div>
         )}
 
-        {(activeTab === "ALL" || activeTab === "STOPPAGES") && isStopped && (
-          <TimelineCard
-            icon={<Pause className="h-4 w-4 text-red-600" />}
-            title="Vehicle Stopped"
-            location={device.Address || "—"}
-            time={dashboard.stoppageTime || "—"}
-            onClick={() => handleTimelineClick("STOP")}
-          />
+        {!loadingTimeline && filteredTimeline.length === 0 && (
+          <p className="text-xs text-gray-500">
+            No events found for this period
+          </p>
         )}
 
-        {(activeTab === "ALL" || activeTab === "MOVEMENT") && isIdle && (
-          <TimelineCard
-            icon={<Pause className="h-4 w-4 text-yellow-600" />}
-            title="Vehicle Idle"
-            location={device.Address || "—"}
-            time="Idle"
-            onClick={() => handleTimelineClick("IDLE")}
-          />
-        )}
+        {!loadingTimeline &&
+          filteredTimeline.map((e, index) => (
+            <TimelineCard
+              key={index}
+              icon={getTimelineIcon(e.type)}
+              title={getTimelineTitle(e.type)}
+              location={e.location || device.Address || "—"}
+              time={formatTimelineTime(e)}
+              distance={e.distance}
+              onClick={() => handleTimelineClick(e.type)}
+            />
+          ))}
       </div>
     </div>
   );
 }
 
-/* ---------------- SMALL COMPONENTS (UNCHANGED) ---------------- */
+/* ---------------- SMALL COMPONENTS ---------------- */
 
 function SummaryItem({ label, value }: { label: string; value: string }) {
   return (
@@ -208,11 +258,10 @@ function Tab({
   return (
     <button
       onClick={onClick}
-      className={`pb-2 ${
-        active
-          ? "border-b-2 border-teal-500 font-medium text-teal-600"
-          : "text-gray-500 hover:text-gray-800"
-      }`}
+      className={`pb-2 ${active
+        ? "border-b-2 border-teal-500 font-medium text-teal-600"
+        : "text-gray-500 hover:text-gray-800"
+        }`}
     >
       {label}
     </button>
@@ -235,7 +284,10 @@ function TimelineCard({
   onClick: () => void;
 }) {
   return (
-    <div onClick={onClick} className="cursor-pointer rounded-lg border p-4 hover:bg-gray-50">
+    <div
+      onClick={onClick}
+      className="cursor-pointer rounded-lg border p-4 hover:bg-gray-50"
+    >
       <p className="mb-2 text-xs text-gray-500">{time}</p>
 
       <div className="flex items-start gap-3">
@@ -246,7 +298,9 @@ function TimelineCard({
         <div className="flex-1 min-w-0">
           <div className="flex justify-between">
             <p className="font-medium">{title}</p>
-            {distance && <span className="text-sm text-gray-600">{distance}</span>}
+            {distance && (
+              <span className="text-sm text-gray-600">{distance}</span>
+            )}
           </div>
 
           <p className="mt-1 text-sm text-gray-600 truncate">{location}</p>

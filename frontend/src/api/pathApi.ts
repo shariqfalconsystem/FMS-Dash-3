@@ -44,6 +44,7 @@ export async function getPath(
         if (res.data === null || res.data.length === 0) {
             alert("❌ Current vehicle path not available");
         }
+        // console.log("res.data", res.data)
 
         return {
             summary: res.data.summary,
